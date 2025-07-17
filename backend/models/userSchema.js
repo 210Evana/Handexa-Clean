@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -9,15 +10,20 @@ const userSchema = new mongoose.Schema({
     minLength: [3, "Name must contain at least 3 Characters!"],
     maxLength: [30, "Name cannot exceed 30 Characters!"],
   },
-  email: {
-    type: String,
-    required: [true, "Please enter your Email!"],
-    validate: [validator.isEmail, "Please provide a valid Email!"],
-  },
+
   phone: {
-    type: Number,
-    required: [true, "Please enter your Phone Number!"],
+  type: String, // <- changed from Number
+  required: [true, "Please enter your Phone Number!"],
+  unique: true, // <- optional
   },
+
+  email: {
+  type: String,
+  required: [true, "Please enter your Email!"],
+  validate: [validator.isEmail, "Please provide a valid Email!"],
+  unique: true, // <- important!
+ },
+
   password: {
     type: String,
     required: [true, "Please provide a Password!"],
@@ -30,10 +36,12 @@ const userSchema = new mongoose.Schema({
     required: [true, "Please select a role"],
     enum: ["Job Seeker", "Employer"],
   },
+
   createdAt: {
     type: Date,
     default: Date.now,
   },
+
 });
 
 
@@ -53,7 +61,7 @@ userSchema.methods.comparePassword = async function (enteredPassword) {
 //GENERATING A JWT TOKEN WHEN A USER REGISTERS OR LOGINS, IT DEPENDS ON OUR CODE THAT WHEN DO WE NEED TO GENERATE THE JWT TOKEN WHEN THE USER LOGIN OR REGISTER OR FOR BOTH. 
 userSchema.methods.getJWTToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET_KEY, {
-    expiresIn: process.env.JWT_EXPIRES,
+    expiresIn: process.env.JWT_EXPIRE,
   });
 };
 
