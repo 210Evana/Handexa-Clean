@@ -1,0 +1,136 @@
+/* Navbar Background */
+.navbarShow {
+  background: linear-gradient(
+    135deg,
+    #c01679, /* baby pink */
+    hsl(195, 57%, 56%), /* light blue */
+    #7fd67f, /* light green */
+    #e9db62  /* lemon yellow */
+  );
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Hide when not authorized */
+.navbarHide {
+  display: none;
+}
+
+.logo-text {
+            font-family: 'Arial', sans-serif;
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+        .logo-hand {
+            color: #ec4899;
+        }
+        .logo-exa {
+            color: #f59e0b;
+        }
+        .logo-bg {
+            background-color: #20a6cf;
+        }
+
+/* Menu Items */
+.menu {
+  display: flex;
+  gap: 20px;
+  list-style: none;
+}
+.nav-label {
+  font-size: 10px;
+  text-align: center;
+  margin-top: 2px;
+}
+.menu li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 10px;
+}
+
+
+.menu li a {
+  color: #333;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.menu li a:hover {
+  color: #ff69b4; /* deeper pink hover */
+}
+
+.navbar-profile {
+  position: relative;
+  cursor: pointer;
+}
+
+.profile-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 10px;
+  z-index: 100;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dropdown-menu a,
+.dropdown-menu button {
+  text-decoration: none;
+  color: #333;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  text-align: left;
+}
+
+.dropdown-menu a:hover,
+.dropdown-menu button:hover {
+  color: #ff69b4; /* baby pink */
+}
+
+
+/* Hamburger */
+.hamburger {
+  display: none;
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+  .hamburger {
+    display: block;
+    font-size: 24px;
+  }
+
+  .menu {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    background-color: #fff;
+    padding: 20px;
+    position: absolute;
+    top: 70px;
+    left: 0;
+    right: 0;
+    z-index: 999;
+  }
+
+  .show-menu {
+    display: flex;
+  }
+}

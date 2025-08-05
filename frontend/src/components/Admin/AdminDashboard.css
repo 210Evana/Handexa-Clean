@@ -1,0 +1,94 @@
+.admin-container {
+  display: flex;
+  min-height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #af62a9ff;
+}
+
+.sidebar {
+  width: 220px;
+  background-color: #1e86a5ff;
+  color: white;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sidebar h2 {
+  margin-bottom: 2rem;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.sidebar button {
+  padding: 10px 15px;
+  background: transparent;
+  border: 1px solid white;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.3s;
+}
+
+.sidebar button:hover,
+.sidebar button.active {
+  background-color: white;
+  color: #cc30a5;
+}
+
+.content {
+  flex: 1;
+  padding: 2rem;
+  background-color: #fff;
+}
+
+.content h2 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background-color: #fff;
+  border: 1px solid #ccc;
+}
+
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+th {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+button.approve {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  margin-right: 5px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+button.block {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+button.approve:disabled,
+button.block:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
