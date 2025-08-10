@@ -164,11 +164,7 @@ const Register = () => {
 
             <button type="submit">Register</button>
             <Link to={"/login"}>Login Now</Link>
-            <p>
-              By registering, you agree to our{" "}
-              <Link to={"/terms"}>Terms of Service</Link> and{" "}
-              <Link to={"/privacy"}>Privacy Policy</Link>.</p>
-
+            
                           
           </form>
         </div>
