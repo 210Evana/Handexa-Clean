@@ -40,7 +40,7 @@ const App = () => {
       }
     };
     fetchUser();
-  }, [isAuthorized, setIsAuthorized, setUser]);
+  }, [isAuthorized]);
 
   return (
     <>
