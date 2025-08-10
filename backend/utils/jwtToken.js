@@ -6,7 +6,7 @@ export const sendToken = (user, statusCode, res, message) => {
     ),
     httpOnly: true, // Set httpOnly to true
     secure: process.env.NODE_ENV === "production", // Set secure to true in production
-    sameSite: "Strict", // Set SameSite attribute to Strict for better security
+    sameSite: "None", // Set SameSite attribute to Strict for better security
   };
 
  res.status(statusCode)

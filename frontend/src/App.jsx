@@ -35,11 +35,12 @@ const App = () => {
         setUser(response.data.user);
         setIsAuthorized(true);
       } catch (error) {
-        setIsAuthorized(false);
+        setIsAuthorized(false);//set to false on error
+        console.log("Authorization error:",error.response?.data?.message || error.message); 
       }
     };
     fetchUser();
-  }, [isAuthorized]);
+  }, [isAuthorized, setIsAuthorized, setUser]);
 
   return (
     <>

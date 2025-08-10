@@ -17,9 +17,9 @@ config({ path: "./config/config.env" });
 // Middleware setup
 app.use(
   cors({
-    origin: [process.env.FRONTEND_URL],
+    origin: "https://handexa.vercel.app",
     method: ["GET", "POST", "DELETE", "PUT"],
-    credentials: true,
+    credentials: true,//allow cookies to be sent
   })
 );
 

@@ -42,7 +42,7 @@ export const login = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Invalid Email Or Password.", 400));
   }
 
-if (user.role.toLowerCase() !== role.toLowerCase())
+if (user.role!== role)
 {
     return next(
       new ErrorHandler(`User with this this email and ${role} not found!`, 404)
