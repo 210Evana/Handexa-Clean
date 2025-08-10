@@ -43,5 +43,10 @@ app.use("/api/v1/admin", AdminRouter);
 // Database connection
 dbConnection();
 
+app.get("/", (req, res) => {
+  res.send("🟢 Handexa backend is running smoothly.");
+});
+
+
 app.use(errorMiddleware);
 export default app;

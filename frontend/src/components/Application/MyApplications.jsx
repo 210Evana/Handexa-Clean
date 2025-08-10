@@ -20,7 +20,7 @@ const MyApplications = () => {
     try {
       if (user && user.role === "Employer") {
         axios
-          .get("http://localhost:4000/api/v1/application/employer/getall", {
+          .get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/application/jobseeker/getall`, {
             withCredentials: true,
           })
           .then((res) => {
@@ -28,7 +28,7 @@ const MyApplications = () => {
           });
       } else {
         axios
-          .get("http://localhost:4000/api/v1/application/jobseeker/getall", {
+          .get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/application/jobseeker/getall`, {
             withCredentials: true,
           })
           .then((res) => {
@@ -49,7 +49,7 @@ const MyApplications = () => {
   const deleteApplication = async(id) => {
     try {
       axios
-        .delete(`http://localhost:4000/api/v1/application/delete/${id}`, {
+        .delete(`${import.meta.env.VITE_BACKEND_URL}/api/v1/application/delete/${id}`, {
           withCredentials: true,
         })
         .then((res) => {
@@ -67,8 +67,8 @@ const MyApplications = () => {
 
 const handleStatusChange = async (applicationId, newStatus) => {
   try {
-    const { data } = await axios.put(
-      `http://localhost:4000/api/v1/application/status/${applicationId}`, // Ensure applicationId matches :id
+    const { data } = await 
+    axios.put(`${import.meta.env.VITE_BACKEND_URL}/api/v1/application/status/${applicationId}`, // Ensure applicationId matches :id
       { status: newStatus },
       { withCredentials: true }
     );

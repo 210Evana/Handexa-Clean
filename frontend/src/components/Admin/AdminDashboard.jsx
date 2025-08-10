@@ -13,19 +13,25 @@ const AdminDashboard = () => {
     const fetchData = async () => {
       try {
         if (view === "users") {
-          const res = await axios.get("http://localhost:4000/api/v1/admin/users", {
-            withCredentials: true,
+          const res = await 
+          axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/users`, {
+          withCredentials: true,
           });
+
           setUsers(res.data.users);
         } else if (view === "jobs") {
-          const res = await axios.get("http://localhost:4000/api/v1/admin/jobs", {
-            withCredentials: true,
+          const res = await 
+          axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/jobs`, {
+          withCredentials: true,
           });
+
           setJobs(res.data.jobs);
         } else if (view === "applications") {
-          const res = await axios.get("http://localhost:4000/api/v1/admin/applications", {
-            withCredentials: true,
-          });
+          const res = await 
+          axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/users`, {
+          withCredentials: true,
+       });
+
           setApplications(res.data.applications);
         }
       } catch (err) {
@@ -38,14 +44,16 @@ const AdminDashboard = () => {
 
   const handleUserStatus = async (userId, status) => {
   try {
-    const res = await axios.put(
-      "http://localhost:4000/api/v1/admin/users/${userId}/status",
+    const res = await 
+    axios.put(`${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/users/${userId}/status`,
       { status },
       { withCredentials: true }
     );
+
     toast.success(res.data.message);
     // Refresh users
-    const updated = await axios.get("http://localhost:4000/api/v1/admin/users", {
+    const updated = await 
+    axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/users`, {
       withCredentials: true,
     });
     setUsers(updated.data.users);

@@ -26,11 +26,12 @@ const App = () => {
     const fetchUser = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:4000/api/v1/user/getuser",
-          {
-            withCredentials: true,
-          }
-        );
+        `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/getuser`,
+       {
+        withCredentials: true,
+       }
+  );
+
         setUser(response.data.user);
         setIsAuthorized(true);
       } catch (error) {

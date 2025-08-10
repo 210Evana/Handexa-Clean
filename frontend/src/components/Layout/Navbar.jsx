@@ -21,7 +21,7 @@ const Navbar = () => {
   const fetchUser = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:4000/api/v1/user/getuser",
+       `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/getuser`,
         { withCredentials: true }
       );
       console.log("Fetch user response:", response.data);
@@ -43,7 +43,7 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:4000/api/v1/user/logout",
+        `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/logout`,
         { withCredentials: true }
       );
       toast.success(response.data.message);

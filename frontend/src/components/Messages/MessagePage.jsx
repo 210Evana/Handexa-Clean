@@ -8,8 +8,11 @@ import MessageBubble from "./MessageBubble";
 import "./Messages.css";
 
 
-const socket = io("http://localhost:4000", {withCredentials: true,
+const socket = io(import.meta.env.VITE_BACKEND_URL, {
+  withCredentials: true,
+  transports: ["websocket"],
 });
+
 
 const MessagePage = () => {
   const { applicationId } = useParams();
@@ -33,7 +36,7 @@ const MessagePage = () => {
     const fetchMessages = async () => {
       setIsLoadingMessages(true); // Set loading state
       try {
-        const { data } = await axios.get(`http://localhost:4000/api/v1/message/${applicationId}`, {
+        const { data } = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/message/${applicationId}`, {
           withCredentials: true,
         });
         //console.log("Messages received:", data.messages);
@@ -67,7 +70,7 @@ const MessagePage = () => {
     const fetchApplicationDetails = async () => {
     setIsLoadingApplication(true); // Set loading state
       try {
-        const res = await axios.get(`http://localhost:4000/api/v1/application/${applicationId}`, {
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/application/${applicationId}`, {
           withCredentials: true,
         });
         //console.log("Application received:", res.data.application);
@@ -91,7 +94,7 @@ const MessagePage = () => {
   try {
     console.log("Sending message:", { applicationId, message: newMessage });
     const response = await axios.post(
-      `http://localhost:4000/api/v1/message/send`,
+      `${import.meta.env.VITE_BACKEND_URL}/api/v1/message/send`,
       { applicationId, message: newMessage },
       { withCredentials: true }
     );
