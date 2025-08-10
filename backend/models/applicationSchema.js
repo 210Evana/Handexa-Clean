@@ -59,6 +59,18 @@ const applicationSchema = new mongoose.Schema({
       required: true,
     },
   },
-});
+  status: {
+    type: String,
+    enum: ["pending", "accepted", "rejected"],
+    default: "pending",
+  },
+  payment:{
+      type: String,
+      enum: ["Paid", "Unpaid"],
+      default: "Unpaid",
+    },
+  },
+  { timestamps: true }
+);
 
 export const Application = mongoose.model("Application", applicationSchema);

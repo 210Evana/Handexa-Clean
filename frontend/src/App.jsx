@@ -16,6 +16,9 @@ import MyApplications from "./components/Application/MyApplications";
 import PostJob from "./components/Job/PostJob";
 import NotFound from "./components/NotFound/NotFound";
 import MyJobs from "./components/Job/MyJobs";
+import MessagePage from "./components/Messages/MessagePage";
+import AdminDashboard from "./components/Admin/AdminDashboard";
+import EditProfile from "./components/Auth/editProfile"; // Import EditProfile
 
 const App = () => {
   const { isAuthorized, setIsAuthorized, setUser } = useContext(Context);
@@ -52,6 +55,9 @@ const App = () => {
           <Route path="/job/post" element={<PostJob />} />
           <Route path="/job/me" element={<MyJobs />} />
           <Route path="*" element={<NotFound />} />
+          <Route path="/message/:applicationId" element={<MessagePage />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/profile/edit" element={<EditProfile />} /> {/* Edit Profile Route */}
         </Routes>
         <Footer />
         <Toaster />

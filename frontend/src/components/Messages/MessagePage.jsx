@@ -7,7 +7,9 @@ import { io } from "socket.io-client";
 import MessageBubble from "./MessageBubble";
 import "./Messages.css";
 
-const socket = io("http://localhost:4000", { withCredentials: true });
+
+const socket = io("http://localhost:4000", {withCredentials: true,
+});
 
 const MessagePage = () => {
   const { applicationId } = useParams();
@@ -29,16 +31,17 @@ const MessagePage = () => {
 
   useEffect(() => {
     const fetchMessages = async () => {
-      console.log("Fetching messages for applicationId:", applicationId);
+      setIsLoadingMessages(true); // Set loading state
       try {
         const { data } = await axios.get(`http://localhost:4000/api/v1/message/${applicationId}`, {
           withCredentials: true,
         });
-        console.log("Messages received:", data.messages);
-        setMessages(data.messages || []);
+        //console.log("Messages received:", data.messages);
+        setMessages(data.messages );
+
       } catch (error) {
-        console.error("Error fetching messages:", error.response || error);
-        toast.error(`Failed to load messages: ${error.response?.data?.message || error.message}`);
+        console.error("Error fetching messages:", error);
+        toast.error("Failed to load messages: " + error.message);
       } finally {
         setIsLoadingMessages(false);
       }
@@ -62,15 +65,15 @@ const MessagePage = () => {
 
   useEffect(() => {
     const fetchApplicationDetails = async () => {
-      console.log("Fetching application details for applicationId:", applicationId);
+    setIsLoadingApplication(true); // Set loading state
       try {
         const res = await axios.get(`http://localhost:4000/api/v1/application/${applicationId}`, {
           withCredentials: true,
         });
-        console.log("Application received:", res.data.application);
+        //console.log("Application received:", res.data.application);
         setApplication(res.data.application);
       } catch (error) {
-        console.error("Error fetching application:", error.response || error);
+        console.error("Error fetching application:", error);
         toast.error("Failed to load application info");
       } finally {
         setIsLoadingApplication(false);
@@ -79,33 +82,35 @@ const MessagePage = () => {
     fetchApplicationDetails();
   }, [applicationId]);
 
-  const handleSend = async (e) => {
-    e.preventDefault();
-    if (!newMessage.trim()) {
-      toast.error("Message cannot be empty");
-      return;
+ const handleSend = async (e) => {
+  e.preventDefault();
+  if (!newMessage.trim()) {
+    toast.error("Message cannot be empty");
+    return;
+  }
+  try {
+    console.log("Sending message:", { applicationId, message: newMessage });
+    const response = await axios.post(
+      `http://localhost:4000/api/v1/message/send`,
+      { applicationId, message: newMessage },
+      { withCredentials: true }
+    );
+    console.log("Message sent successfully:", response.data.newMessage);
+    setNewMessage("");
+  } catch (error) {
+    console.error("Error sending message:", error.response || error);
+    const message = error.response?.data?.message || error.message;
+    if (error.response?.status === 401) {
+      toast.error("Please log in to send messages");
+    } else if (error.response?.status === 403) {
+      toast.error("You are not authorized to send messages for this application");
+    } else if (error.response?.status === 404) {
+      toast.error("Application not found");
+    } else {
+      toast.error(`Failed to send message: ${message}`);
     }
-    try {
-      console.log("Sending message:", { applicationId, message: newMessage });
-      const response = await axios.post(
-        `http://localhost:4000/api/v1/message/send`,
-        { applicationId, message: newMessage },
-        { withCredentials: true }
-      );
-      const sentMessage = response.data.newMessage;
-      socket.emit("sendMessage", {
-        applicationId,
-        message: sentMessage.message,
-        senderId: user._id,
-        senderName: user.name,
-        createdAt: sentMessage.createdAt,
-      });
-      setNewMessage("");
-    } catch (error) {
-      console.error("Error sending message:", error.response || error);
-      toast.error("Failed to send message: " + (error.response?.data?.message || error.message));
-    }
-  };
+  }
+};
 
   if (!user) return <div>Loading user...</div>;
 
@@ -113,15 +118,17 @@ const MessagePage = () => {
     <div className="message-page">
       {isLoadingApplication ? (
         <div className="loading">Loading application details...</div>
-      ) : !application ? (
-        <div className="error">Application not found or inaccessible.</div>
-      ) : (
-        <div className="chat-header">
+      ) : application ? (
+            
+         <div className="chat-header">
           <h2>Chat: {user.name} ↔ {application.user.name || "Unknown User"}</h2>
         </div>
+      ):(
+        <div className="error">Application not found</div>
       )}
-      <div className="chat-container">
+      <div className ="chat-container">
         {isLoadingMessages ? (
+
           <div className="loading">Loading messages...</div>
         ) : messages.length === 0 ? (
           <div className="no-messages">No messages yet. Start the conversation!</div>

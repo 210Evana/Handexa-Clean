@@ -3,9 +3,11 @@ import { getAllUsers,
          updateUserStatus, 
          getAllJobs, 
          updateJobStatus, 
-         adminGetAllApplications, } 
-from "../controllers/adminController.js";
+         adminGetAllApplications, 
+         
+ } from "../controllers/adminController.js";
 import { isAuthorized, isAdmin } from "../middlewares/auth.js";
+
 
 const router = express.Router();
 

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -90,29 +90,26 @@ const PostJob = () => {
                 onChange={(e) => setCategory(e.target.value)}
               >
                 <option value="">Select Category</option>
-                <option value="Graphics & Design">Graphics & Design</option>
-                <option value="Mobile App Development">
-                  Mobile App Development
-                </option>
-                <option value="Frontend Web Development">
-                  Frontend Web Development
-                </option>
-                <option value="MERN Stack Development">
-                  MERN STACK Development
-                </option>
-                <option value="Account & Finance">Account & Finance</option>
-                <option value="Artificial Intelligence">
-                  Artificial Intelligence
-                </option>
-                <option value="Video Animation">Video Animation</option>
-                <option value="MEAN Stack Development">
-                  MEAN STACK Development
-                </option>
-                <option value="MEVN Stack Development">
-                  MEVN STACK Development
-                </option>
-                <option value="Data Entry Operator">Data Entry Operator</option>
-              </select>
+                
+  <option value="Cleaners">Cleaners</option>
+  <option value="Chefs & Cooks">Chefs & Cooks</option>
+  <option value="Nannies">Nannies</option>
+  <option value="Photographers">Photographers</option>
+  <option value="Househelps">Househelps</option>
+  <option value="Construction Workers">Construction Workers</option>
+  <option value="Artisans">Artisans</option>
+  <option value="Gardeners">Gardeners</option>
+  <option value="Plumbers and Electricians">Plumbers and Electricians</option>
+  <option value="Masseuse/Masseur">Masseuse/Masseur</option>
+  <option value="Event Planners">Event Planners</option>
+  <option value="Nail Technicians">Nail Technicians</option>
+  <option value="Make Up Artists">Make Up Artists</option>
+  <option value="Fumigators">Fumigators</option>
+  <option value="Painter">Painter</option>
+  <option value="Drivers">Drivers</option>
+  <option value="Agricultural Workers">Agricultural Workers</option>
+</select>
+              
             </div>
             <div className="wrapper">
               <input

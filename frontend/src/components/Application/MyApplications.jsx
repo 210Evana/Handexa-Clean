@@ -2,8 +2,10 @@ import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../../main";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,Link } from "react-router-dom";
 import ResumeModal from "./ResumeModal";
+
+
 
 const MyApplications = () => {
   const { user } = useContext(Context);
@@ -36,13 +38,15 @@ const MyApplications = () => {
     } catch (error) {
       toast.error(error.response.data.message);
     }
-  }, [isAuthorized]);
+  }, [isAuthorized, user]);
 
   if (!isAuthorized) {
     navigateTo("/");
   }
 
-  const deleteApplication = (id) => {
+ 
+
+  const deleteApplication = async(id) => {
     try {
       axios
         .delete(`http://localhost:4000/api/v1/application/delete/${id}`, {
@@ -58,6 +62,30 @@ const MyApplications = () => {
       toast.error(error.response.data.message);
     }
   };
+
+   // ... (previous imports and MyApplications component remain the same)
+
+const handleStatusChange = async (applicationId, newStatus) => {
+  try {
+    const { data } = await axios.put(
+      `http://localhost:4000/api/v1/application/status/${applicationId}`, // Ensure applicationId matches :id
+      { status: newStatus },
+      { withCredentials: true }
+    );
+    toast.success(data.message);
+    setApplications(prev =>
+      prev.map(application => application._id === applicationId ? { ...application, status: newStatus } : application)
+    );
+
+    if (newStatus === "accepted") {
+      toast.success("Payment initiated (pending confirmation)");
+    }
+  } catch (error) {
+    toast.error(error.response?.data?.message || "Failed to update status");
+  }
+};
+
+// ... (rest of the component remains the same)
 
   const openModal = (imageUrl) => {
     setResumeImageUrl(imageUrl);
@@ -86,6 +114,7 @@ const MyApplications = () => {
                   key={element._id}
                   deleteApplication={deleteApplication}
                   openModal={openModal}
+                  navigateTo={navigateTo}
                 />
               );
             })
@@ -105,6 +134,8 @@ const MyApplications = () => {
                   element={element}
                   key={element._id}
                   openModal={openModal}
+                  handleStatusChange={handleStatusChange}
+                  navigateTo={navigateTo}
                 />
               );
             })
@@ -118,9 +149,10 @@ const MyApplications = () => {
   );
 };
 
+
 export default MyApplications;
 
-const JobSeekerCard = ({ element, deleteApplication, openModal }) => {
+const JobSeekerCard = ({ element, deleteApplication, openModal, navigateTo }) => {
   return (
     <>
       <div className="job_seeker_card">
@@ -140,7 +172,13 @@ const JobSeekerCard = ({ element, deleteApplication, openModal }) => {
           <p>
             <span>CoverLetter:</span> {element.coverLetter}
           </p>
+          <p>
+            <span>Status:</span><strong style={{ color: element.status === "accepted" ? "green" : element.status === "rejected" ? "red" : "orange" }}>
+              {element.status}
+            </strong> {/* Display status with color */}
+          </p>
         </div>
+
         <div className="resume">
           <img
             src={element.resume.url}
@@ -148,17 +186,24 @@ const JobSeekerCard = ({ element, deleteApplication, openModal }) => {
             onClick={() => openModal(element.resume.url)}
           />
         </div>
+
         <div className="btn_area">
           <button onClick={() => deleteApplication(element._id)}>
             Delete Application
           </button>
-        </div>
+
+          <button onClick={()=> 
+            navigateTo(`/message/${element._id}`)}>Message
+            </button>
+                    </div>
+
+
       </div>
     </>
   );
 };
 
-const EmployerCard = ({ element, openModal }) => {
+const EmployerCard = ({ element, openModal,handleStatusChange, navigateTo }) => {
   return (
     <>
       <div className="job_seeker_card">
@@ -178,6 +223,18 @@ const EmployerCard = ({ element, openModal }) => {
           <p>
             <span>CoverLetter:</span> {element.coverLetter}
           </p>
+          <p>
+            <span>Status:</span>
+            <strong>{element.status}</strong>
+                      </p>
+                      <select
+            value={element.status}
+            onChange={(e) => handleStatusChange(element._id, e.target.value)}
+          >
+            <option value="pending">Pending</option>
+            <option value="accepted">Accepted</option>
+            <option value="rejected">Rejected</option>
+            </select>
         </div>
         <div className="resume">
           <img
@@ -186,6 +243,9 @@ const EmployerCard = ({ element, openModal }) => {
             onClick={() => openModal(element.resume.url)}
           />
         </div>
+        <button onClick={()=>
+          navigateTo(`/message/${element._id}`)}>Message
+            </button>
       </div>
     </>
   );

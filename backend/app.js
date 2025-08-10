@@ -4,7 +4,8 @@ import jobRouter from "./routes/jobRoutes.js";
 import userRouter from "./routes/userRoutes.js";
 import applicationRouter from "./routes/applicationRoutes.js";
 import { config } from "dotenv";
-import dotenv from "dotenv";
+import MessageRouter from "./routes/messageRoutes.js";
+import AdminRouter from "./routes/adminRoutes.js";
 import cors from "cors";
 import { errorMiddleware } from "./middlewares/error.js";
 import cookieParser from "cookie-parser";
@@ -13,6 +14,7 @@ import fileUpload from "express-fileupload";
 const app = express();
 config({ path: "./config/config.env" });
 
+// Middleware setup
 app.use(
   cors({
     origin: [process.env.FRONTEND_URL],
@@ -31,10 +33,14 @@ app.use(
     tempFileDir: "/tmp/",
   })
 );
+// Route setup
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/job", jobRouter);
 app.use("/api/v1/application", applicationRouter);
+app.use("/api/v1/message",MessageRouter);
+app.use("/api/v1/admin", AdminRouter);
 
+// Database connection
 dbConnection();
 
 app.use(errorMiddleware);

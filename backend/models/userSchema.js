@@ -34,13 +34,17 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     required: [true, "Please select a role"],
-    enum: ["Job Seeker", "Employer"],
+    enum: ["Job Seeker", "Employer" ,"Admin"],
   },
 
   createdAt: {
     type: Date,
     default: Date.now,
   },
+  avatar: {
+    public_id: String,
+    url: String,
+  }
 
 });
 
