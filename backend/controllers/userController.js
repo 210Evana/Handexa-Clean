@@ -42,7 +42,7 @@ export const login = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Invalid Email Or Password.", 400));
   }
 
-if (user.role!== role)
+if (user.role !== role)
 {
     return next(
       new ErrorHandler(`User with this this email and ${role} not found!`, 404)
@@ -58,7 +58,6 @@ export const logout = catchAsyncErrors(async (req, res, next) => {
     .cookie("token", "", {
       httpOnly: true,
       secure:true,
-      sameSite: "None",
       expires: new Date(Date.now()),
     })
     .json({
