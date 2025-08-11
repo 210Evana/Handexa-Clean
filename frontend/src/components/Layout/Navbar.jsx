@@ -69,13 +69,13 @@ const Navbar = () => {
               <li>
                 <Link to="/" onClick={() => setShow(false)}>
                   <FaHome className="nav-icon" />
-                  <span className="nav-text">home</span>
+                  <span className="nav-text">Home</span>
                 </Link>
               </li>
               <li>
                 <Link to="/job/getall" onClick={() => setShow(false)}>
                   <FaBriefcase className="nav-icon" />
-                  <span className="nav-text">all jobs</span>
+                  <span className="nav-text">Jobs</span>
                 </Link>
               </li>
               <li>
@@ -93,13 +93,13 @@ const Navbar = () => {
                   <li>
                     <Link to="/job/post" onClick={() => setShow(false)}>
                       <FaPlus className="nav-icon" />
-                      <span className="nav-text">post new job</span>
+                      <span className="nav-text">Post job</span>
                     </Link>
                   </li>
                   <li>
                     <Link to="/job/me" onClick={() => setShow(false)}>
                       <FaList className="nav-icon" />
-                      <span className="nav-text">view your jobs</span>
+                      <span className="nav-text">View your jobs</span>
                     </Link>
                   </li>
                 </>
@@ -111,7 +111,7 @@ const Navbar = () => {
             <li>
               <Link to="/admin/dashboard" onClick={() => setShow(false)}>
                 <FaHome className="nav-icon" />
-                <span className="nav-text">admin dashboard</span>
+                <span className="nav-text">Dashboard</span>
               </Link>
             </li>
           )}

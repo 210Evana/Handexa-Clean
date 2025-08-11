@@ -1,6 +1,6 @@
 /* Navbar general styles */
 .navbarShow {
-  background: linear-gradient(90deg, #ff6f61, #ffcc70, #6a82fb);
+  background: linear-gradient(90deg, #aa1196, #ffcc70, #6a82fb);
   padding: 10px 20px;
   color: white;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
@@ -52,8 +52,10 @@
   text-decoration: none;
   display: flex;
   align-items: center;
-  gap: 6px;
+  flex-direction: column;
+  gap: 4px;
   transition: 0.3s;
+  font-size: 13px;
 }
 
 .menu a:hover {
@@ -62,7 +64,12 @@
 }
 
 .nav-icon {
-  font-size: 18px;
+  font-size: 24px;
+}
+.nav-text {
+  font-size: 12px;
+  text-align: center;
+  line-height: 1.2;
 }
 
 /* Profile section */
@@ -124,5 +131,20 @@
   }
   .hamburger {
     display: block;
+  }
+}
+@media (min-width: 768px) {
+  .menu a {
+    flex-direction: row;
+    gap: 6px;
+  }
+
+  .nav-icon {
+    font-size: 18px;
+  }
+
+  .nav-text {
+    font-size: 14px;
+    text-align: left;
   }
 }
