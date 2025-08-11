@@ -18,7 +18,7 @@ config({ path: "./config/config.env" });
 app.use(
   cors({
     origin: "https://handexa.vercel.app",
-    method: ["GET", "POST", "DELETE", "PUT"],
+    methods: ["GET", "POST", "DELETE", "PUT"],
     credentials: true,//allow cookies to be sent
   })
 );
