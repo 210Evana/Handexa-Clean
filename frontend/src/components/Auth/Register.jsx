@@ -9,7 +9,7 @@ import { Context } from "../../main";
 import "./Auth.css"; // Assuming you have a CSS file for styling
 
 const Register = () => {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState ("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
@@ -89,7 +89,7 @@ const Register = () => {
               <div>
                 <input
                   type="text"
-                  placeholder="Ephantus"
+                  placeholder="Tavian"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
@@ -138,24 +138,12 @@ const Register = () => {
                 />
                 {showPassword ? (
                   <FaEyeSlash
-                    style={{
-                      position: "absolute",
-                      top: "50%",
-                      right: "10px",
-                      cursor: "pointer",
-                      transform: "translateY(-50%)",
-                    }}
+                    
                     onClick={() => setShowPassword(false)}
                   />
                 ) : (
                   <FaEye
-                    style={{
-                      position: "absolute",
-                      top: "50%",
-                      right: "10px",
-                      cursor: "pointer",
-                      transform: "translateY(-50%)",
-                    }}
+                    
                     onClick={() => setShowPassword(true)}
                   />
                 )}
