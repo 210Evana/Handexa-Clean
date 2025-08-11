@@ -11,13 +11,17 @@ cloudinary.v2.config({
 
 const server = http.createServer(app);
 
+console.log("Allowing CORS origin:", process.env.FRONTEND_URL);
+
 const io = new Server(server, {
   cors: {
     origin: process.env.FRONTEND_URL,
-    methods: ["GET", "POST"],
     credentials: true,
+    methods: ["GET", "POST"],
   },
 });
+
+
 
 io.on("connection", (socket) => {
   console.log("New client connected:", socket.id);
