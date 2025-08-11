@@ -132,13 +132,19 @@ p {
   outline: none;
 }
 .authPage .container form .inputTag div svg {
-  width: 10%;
-  font-size: 1.5rem;
-  background: #e232bcff;
-  height: 100%;
+  width: auto;
+  min-width: 40px;
+  height: auto;
+  font-size: 1.8rem;
   padding: 8px;
   color: #fff;
+  background: #e232bcff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
 }
+
 .authPage .container form button {
   padding: 12px;
   text-align: center;
