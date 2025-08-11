@@ -2,13 +2,24 @@
             font-family: 'Arial', sans-serif;
             font-weight: 900;
             letter-spacing: -1px;
+            font-size: 1.5em;
+            color: #333;
         }
         .logo-hand {
-            color: #ec4899;
+            color: rgb(194, 111, 154);
+            font-size: 1.2em;
+            font-weight: 900;
+            font-style: italic;
+            margin-right: 0.2em;
         }
         .logo-exa {
-            color: #f59e0b;
+            color: hsl(281, 90%, 24%);
+            font-size: 1.2em;
+            font-weight: 900;
         }
         .logo-bg {
             background-color: #20a6cf;
+            font-weight:900;
+            color: white;
+            padding: 0.2em 0.4em;
         }
