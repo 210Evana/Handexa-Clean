@@ -184,20 +184,7 @@ return (
 
             <FaEyeSlash
 
-              style={{
-
-                position: "absolute",
-
-                top: "50%",
-
-                right: "10px",
-
-                cursor: "pointer",
-
-                transform: "translateY(-50%)",
-
-              }}
-
+              
               onClick={() => setShowPassword(false)}
 
             />
@@ -206,20 +193,7 @@ return (
 
             <FaEye
 
-              style={{
-
-                position: "absolute",
-
-                top: "50%",
-
-                right: "10px",
-
-                cursor: "pointer",
-
-                transform: "translateY(-50%)",
-
-              }}
-
+              
               onClick={() => setShowPassword(true)}
 
             />
