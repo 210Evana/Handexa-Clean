@@ -203,8 +203,8 @@ p {
 
 .authPage .banner img {
   width: 100%;
-  width: 550px;
-  height: 550px;
+  width: 500px;
+  height: 500px;
 }
 
 @media (max-width: 1520px) {

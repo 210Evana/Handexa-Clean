@@ -81,7 +81,7 @@ return (
 
         className="logo-bg rounded-circle d-flex align-items-center justify-content-center me-3"
 
-        style={{ width: "100px", height: "60px" }}
+        style={{ width: "110px", height: "60px" }}
 
       >
 
@@ -123,7 +123,7 @@ return (
 
           </select>
 
-          <FaRegUser />
+          <FaRegUser style={{ fontSize: "1.5rem" }} />
 
         </div>
 
@@ -151,7 +151,7 @@ return (
 
           />
 
-          <MdOutlineMailOutline />
+          <MdOutlineMailOutline style={{ fontSize: "1.5rem" }} />
 
         </div>
 
@@ -186,6 +186,7 @@ return (
 
               
               onClick={() => setShowPassword(false)}
+              style={{ fontSize: "1.5rem", cursor: "pointer" }}
 
             />
 
@@ -195,6 +196,7 @@ return (
 
               
               onClick={() => setShowPassword(true)}
+              style={{ fontSize: "1.5rem", cursor: "pointer" }}
 
             />
 
