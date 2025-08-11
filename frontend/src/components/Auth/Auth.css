@@ -1,125 +1,14 @@
-/* ===== Auth.css (Add or update this) ===== */
-
-.authPage {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 2rem;
-  background-color: #f3f4f6;
-  gap: 2rem;
-  flex-wrap: wrap;
-}
-
-.container {
-  max-width: 400px;
-  width: 100%;
-  background: #fff;
-  padding: 2rem;
-  border-radius: 1rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
 .logo-text {
-  font-family: 'Arial', sans-serif;
-  font-weight: 900;
-  letter-spacing: -1px;
-}
-
-.logo-hand {
-  color: #ec4899;
-}
-
-.logo-exa {
-  color: #f59e0b;
-}
-
-.logo-bg {
-  background-color: #20a6cf;
-}
-
-.inputTag {
-  margin-bottom: 1.5rem;
-}
-
-.inputTag label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-}
-
-.inputTag div {
-  display: flex;
-  align-items: center;
-  border: 1px solid #ccc;
-  border-radius: 0.5rem;
-  padding: 0.5rem 1rem;
-  background-color: #f9fafb;
-  transition: border 0.3s ease;
-}
-
-.inputTag div:focus-within {
-  border-color: #20a6cf;
-}
-
-.inputTag input,
-.inputTag select {
-  flex: 1;
-  border: none;
-  outline: none;
-  font-size: 1rem;
-  background: transparent;
-  padding: 0.5rem;
-}
-
-.inputTag svg {
-  font-size: 1.2rem;
-  color: #666;
-  margin-left: 0.5rem;
-}
-
-button[type="submit"] {
-  width: 100%;
-  padding: 0.75rem;
-  background-color: #20a6cf;
-  color: #fff;
-  border: none;
-  border-radius: 0.5rem;
-  font-weight: 700;
-  font-size: 1rem;
-  transition: background-color 0.3s ease;
-  margin-bottom: 1rem;
-}
-
-button[type="submit"]:hover {
-  background-color: #1e90b8;
-}
-
-a {
-  display: block;
-  text-align: center;
-  color: #20a6cf;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
-.banner img {
-  max-width: 400px;
-  width: 100%;
-  border-radius: 1rem;
-}
-.banner {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 2rem;
-}
+            font-family: 'Arial', sans-serif;
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+        .logo-hand {
+            color: #ec4899;
+        }
+        .logo-exa {
+            color: #f59e0b;
+        }
+        .logo-bg {
+            background-color: #20a6cf;
+        }
