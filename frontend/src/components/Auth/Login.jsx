@@ -123,7 +123,7 @@ return (
 
           </select>
 
-          <FaRegUser style={{ fontSize: "1.5rem" }} />
+          <FaRegUser />
 
         </div>
 
@@ -151,7 +151,7 @@ return (
 
           />
 
-          <MdOutlineMailOutline style={{ fontSize: "1.5rem" }} />
+          <MdOutlineMailOutline />
 
         </div>
 
@@ -186,7 +186,7 @@ return (
 
               
               onClick={() => setShowPassword(false)}
-              style={{ fontSize: "1.5rem", cursor: "pointer" }}
+              className="password-toggle"
 
             />
 
@@ -196,7 +196,7 @@ return (
 
               
               onClick={() => setShowPassword(true)}
-              style={{ fontSize: "1.5rem", cursor: "pointer" }}
+              className="password-toggle"
 
             />
 

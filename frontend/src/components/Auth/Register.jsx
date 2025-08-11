@@ -80,7 +80,7 @@ const Register = () => {
                   <option value="Job Seeker">Job Seeker</option>
                   
                 </select>
-                <FaRegUser style={{ fontSize: "1.5rem" }} />
+                <FaRegUser />
               </div>
             </div>
 
@@ -94,7 +94,7 @@ const Register = () => {
                   onChange={(e) => setName(e.target.value)}
                   required
                 />
-                <FaPencilAlt style={{ fontSize: "1.5rem" }} />
+                <FaPencilAlt />
               </div>
             </div>
 
@@ -108,7 +108,7 @@ const Register = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
-                <MdOutlineMailOutline style={{ fontSize: "1.5rem" }} />
+                <MdOutlineMailOutline />
               </div>
             </div>
 
@@ -122,7 +122,7 @@ const Register = () => {
                   onChange={(e) => setPhone(e.target.value)}
                   required
                 />
-                <FaPhoneFlip style={{ fontSize: "1.5rem" }} />
+                <FaPhoneFlip />
               </div>
             </div>
 
@@ -140,14 +140,14 @@ const Register = () => {
                   <FaEyeSlash
                     
                     onClick={() => setShowPassword(false)}
-                    style={{ fontSize: "1.5rem", cursor: "pointer" }}
+                    className="password-toggle"
                   />
 
                 ) : (
                   <FaEye
                     
                     onClick={() => setShowPassword(true)}
-                    style={{ fontSize: "1.5rem", cursor: "pointer" }}
+                    className="password-toggle"
                   />
                 )}
                 
