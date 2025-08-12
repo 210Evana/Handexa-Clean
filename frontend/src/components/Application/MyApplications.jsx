@@ -4,7 +4,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useNavigate,Link } from "react-router-dom";
 import ResumeModal from "./ResumeModal";
-import "Application.css";
+import "./Application.css";
 
 
 
