@@ -1,0 +1,161 @@
+/* frontend/src/styles/Application.css */
+.my_applications {
+  background: #f1f3f6; /* Light gray */
+  padding: 50px 20px;
+  min-height: 100vh;
+}
+
+.my_applications .container {
+  max-width: 1500px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 35px;
+  align-items: center;
+}
+
+.job_seeker_card {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 20px 0;
+  width: 100%;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.job_seeker_card .detail {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 20px;
+}
+
+.job_seeker_card .detail span {
+  font-weight: bold;
+  color: #18191c;
+}
+
+.job_seeker_card .detail select {
+  margin-top: 10px;
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #e6f7fc; /* Baby blue */
+  color: #18191c;
+  cursor: pointer;
+  width: 150px;
+}
+
+.job_seeker_card .detail select:focus {
+  outline: none;
+  border-color: #20a6cf;
+}
+
+.job_seeker_card .resume {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.job_seeker_card .resume img {
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.job_seeker_card .btn_area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.job_seeker_card .btn_area button {
+  background: #e232bcff; /* Baby pink */
+  color: #fff;
+  border: none;
+  padding: 10px 30px;
+  font-size: 18px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.job_seeker_card .btn_area button:hover {
+  background: #d81b60; /* Darker pink */
+}
+
+.application .container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.application h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #18191c;
+}
+
+.application form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.application form input,
+.application form textarea {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.application form textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.application form button {
+  background: #e232bcff; /* Baby pink */
+  color: #fff;
+  border: none;
+  padding: 10px 30px;
+  font-size: 18px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.application form button:hover {
+  background: #d81b60; /* Darker pink */
+}
+
+@media (max-width: 1150px) {
+  .job_seeker_card .detail,
+  .job_seeker_card .resume,
+  .job_seeker_card .btn_area {
+    flex: 1;
+  }
+}
+
+@media (max-width: 850px) {
+  .job_seeker_card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .job_seeker_card .resume {
+    width: 100%;
+    margin: 20px 0;
+  }
+}

@@ -3,6 +3,7 @@ import React, { useContext, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 import { Context } from "../../main";
+import "./Application.css";
 
 const Application = () => {
   const [name, setName] = useState("");
@@ -13,8 +14,9 @@ const Application = () => {
   const [resume, setResume] = useState(null);
 
   const { isAuthorized, user } = useContext(Context);
-
   const navigateTo = useNavigate();
+  const { id } = useParams();
+
 
   // Function to handle file input changes
   const handleFileChange = (event) => {
@@ -22,7 +24,7 @@ const Application = () => {
     setResume(resume);
   };
 
-  const { id } = useParams();
+  
   const handleApplication = async (e) => {
     e.preventDefault();
     const formData = new FormData();
@@ -30,9 +32,10 @@ const Application = () => {
     formData.append("email", email);
     formData.append("phone", phone);
     formData.append("address", address);
-    formData.append("coverLetter", coverLetter);
+    if (coverLetter) formData.append("coverLetter", coverLetter);
     formData.append("resume", resume);
     formData.append("jobId", id);
+
 
     try {
       const { data } = await axios.post(
@@ -50,16 +53,17 @@ const Application = () => {
       setCoverLetter("");
       setPhone("");
       setAddress("");
-      setResume("");
+      setResume(null);
       toast.success(data.message);
       navigateTo("/job/getall");
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Application failed");
     }
   };
 
   if (!isAuthorized || (user && user.role === "Employer")) {
     navigateTo("/");
+    return null;
   }
 
   return (
@@ -72,44 +76,52 @@ const Application = () => {
             placeholder="Your Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            required
           />
+
           <input
             type="email"
             placeholder="Your Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
           />
+
           <input
             type="number"
             placeholder="Your Phone Number"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
+            required
           />
+
           <input
             type="text"
             placeholder="Your Address"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
+
           />
           <textarea
-            placeholder="CoverLetter..."
+            placeholder="CoverLetter (Optional)"
             value={coverLetter}
             onChange={(e) => setCoverLetter(e.target.value)}
           />
           <div>
-            <label
-              style={{ textAlign: "start", display: "block", fontSize: "20px" }}
-            >
+            
+            <label style={{ textAlign: "start", display: "block", fontSize: "20px" }}>
               Select Resume
             </label>
             <input
               type="file"
-              accept=".pdf, .jpg, .png"
+              accept=".pdf, .jpg, .png, .webp"
               onChange={handleFileChange}
               style={{ width: "100%" }}
+              required
             />
           </div>
-          <button type="submit">Send Application</button>
+
+           <button type="submit" style={{ background: "#e232bcff" }}>Send Application</button>
         </form>
       </div>
     </section>
