@@ -76,7 +76,7 @@ export const employerGetAllApplications = catchAsyncErrors(async (req, res, next
   }
    const { _id } = req.user;
   const applications = await Application.find({ "employerID.user": req.user._id })
-    .populate("job", "title company location")
+    .populate("job", "title status")
     .populate("applicantID.user", "name email phone");
   res.status(200).json({ success: true, applications });
 });
@@ -169,7 +169,7 @@ export const getApplicationById = catchAsyncErrors(async (req, res, next) => {
   const application = await Application.findById(applicationId)
     .populate("applicantID.user", "name email role") // Updated to match schema
     .populate("employerID.user", "name email role")
-    .populate("job", "title status");
+    .populate("jobId", "title status");
   if (!application) return next(new ErrorHandler("Application not found", 404));
   if( application.user._id.toString() !== req.user._id.toString() &&
       application.job.user.toString() !== req.user._id.toString()) {
