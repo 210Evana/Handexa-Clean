@@ -45,7 +45,10 @@ const App = () => {
   return (
     <>
       <BrowserRouter>
+        
         <Navbar />
+       
+        {/* Main content will be rendered here */}
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -61,7 +64,10 @@ const App = () => {
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           
         </Routes>
+        
+      
         <Footer />
+     
         <Toaster />
       </BrowserRouter>
     </>
