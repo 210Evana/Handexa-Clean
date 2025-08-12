@@ -10,8 +10,7 @@ const HowItWorks = () => {
         <div className="container">
 
           <h3>How Handexa Works</h3>
-          <h4>Exciting offers at Handexa <h4/>
-
+          
           <div className="banner">
 
             <div className="card">
