@@ -25,17 +25,22 @@ const Application = () => {
   };
 
   
-  const handleApplication = async (e) => {
+const handleApplication = async (e) => {
     e.preventDefault();
+    if (!coverLetter) {
+      toast.error("Please provide a cover letter.");
+      return;
+    }
     const formData = new FormData();
     formData.append("name", name);
     formData.append("email", email);
     formData.append("phone", phone);
     formData.append("address", address);
-    if (coverLetter) formData.append("coverLetter", coverLetter);
-    formData.append("resume", resume);
+    formData.append("coverLetter", coverLetter);
+    if (resume) {
+      formData.append("resume", resume);
+    }
     formData.append("jobId", id);
-
 
     try {
       const { data } = await axios.post(
