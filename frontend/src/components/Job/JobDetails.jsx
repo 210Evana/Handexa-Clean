@@ -23,7 +23,7 @@ const JobDetails = () => {
       });
   }, []);
 
-  if (!isAuthorized) {   
+  if (!isAuthorized) {
     navigateTo("/login");
   }
 
