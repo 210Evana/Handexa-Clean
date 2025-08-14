@@ -58,7 +58,7 @@ export const postApplication = catchAsyncErrors(async (req, res, next) => {
         user: jobDetails.postedBy,
         role: "Employer",
       },
-      jobId,
+      
     });
 
     res.status(200).json({
@@ -112,6 +112,7 @@ export const employerGetAllApplications = catchAsyncErrors(async (req, res, next
   }
 });
 
+
 // Job Seeker deletes an application
 export const jobseekerDeleteApplication = catchAsyncErrors(async (req, res, next) => {
   try {
@@ -119,6 +120,7 @@ export const jobseekerDeleteApplication = catchAsyncErrors(async (req, res, next
     if (role === "Employer") {
       return next(new ErrorHandler("Employer not allowed to access this resource.", 400));
     }
+    
     const application = await Application.findById(req.params.id);
     if (!application) {
       return next(new ErrorHandler("Application not found!", 404));
