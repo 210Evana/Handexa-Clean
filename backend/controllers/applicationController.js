@@ -145,7 +145,7 @@ export const updateApplicationStatus = catchAsyncErrors(async (req, res, next) =
     return next(new ErrorHandler("Job Seeker not allowed to update status", 403));
   }
 
-  const { id } = req.params; // Changed from applicationId to id for consistency
+  const { _id } = req.params; // Changed from applicationId to id for consistency
   const { status } = req.body;
   if (!["pending", "accepted", "rejected"].includes(status)) {
     return next(new ErrorHandler("Invalid status value", 400));
