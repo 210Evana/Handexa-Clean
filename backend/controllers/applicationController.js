@@ -4,68 +4,72 @@ import { Application } from "../models/applicationSchema.js";
 import { Job } from "../models/jobSchema.js";
 import cloudinary from "cloudinary";
 
-// Job Seeker applies for a job
+/ Job Seeker applies for a job
 export const postApplication = catchAsyncErrors(async (req, res, next) => {
-  const { role } = req.user;
-  if (role === "Employer") {
-    return next(new ErrorHandler("Employers not allowed to apply for jobs.", 400));
-  }
-
-  const { name, email, coverLetter, phone, address, jobId } = req.body;
-
-  if (!name || !email || !phone || !address || !jobId) {
-    return next(new ErrorHandler("Please fill in all required fields.", 400));
-  }
-
-  const jobDetails = await Job.findById(jobId);
-  if (!jobDetails) {
-    return next(new ErrorHandler("Job not found!", 404));
-  }
-
-  let resumeData = null;
-  if (req.files && req.files.resume) {
-    const resume = req.files.resume;
-    const allowedFormats = ["image/png", "image/jpeg", "image/webp"];
-    if (!allowedFormats.includes(resume.mimetype)) {
-      return next(
-        new ErrorHandler("Invalid file type. Only PNG, JPEG, or WEBP allowed.", 400)
-      );
-    }
-    const cloudinaryResponse = await cloudinary.uploader.upload(resume.tempFilePath);
-
-    if (!cloudinaryResponse || cloudinaryResponse.error) {
-      console.error("Cloudinary Error:", cloudinaryResponse.error || "Unknown Cloudinary error");
-      return next(new ErrorHandler("Failed to upload Resume to Cloudinary", 500));
+  try {
+    const { role } = req.user;
+    if (role === "Employer") {
+      return next(new ErrorHandler("Employers not allowed to apply for jobs.", 400));
     }
 
-    resumeData = {
-      public_id: cloudinaryResponse.public_id,
-      url: cloudinaryResponse.secure_url,
-    };
+    const { name, email, coverLetter, phone, address, jobId } = req.body;
+
+    if (!name || !email || !coverLetter || !phone || !address || !jobId) {
+      return next(new ErrorHandler("Please fill in all required fields, including cover letter and job ID.", 400));
+    }
+
+    const jobDetails = await Job.findById(jobId);
+    if (!jobDetails) {
+      return next(new ErrorHandler("Job not found!", 404));
+    }
+
+    let resumeData = null;
+    if (req.files && req.files.resume) {
+      const resume = req.files.resume;
+      const allowedFormats = ["image/png", "image/jpeg", "image/webp"];
+      if (!allowedFormats.includes(resume.mimetype)) {
+        return next(
+          new ErrorHandler("Invalid file type. Only PNG, JPEG, or WEBP allowed.", 400)
+        );
+      }
+      const cloudinaryResponse = await cloudinary.uploader.upload(resume.tempFilePath);
+      if (!cloudinaryResponse || cloudinaryResponse.error) {
+        console.error("Cloudinary Error:", cloudinaryResponse.error || "Unknown Cloudinary error");
+        return next(new ErrorHandler("Failed to upload Resume to Cloudinary", 500));
+      }
+      resumeData = {
+        public_id: cloudinaryResponse.public_id,
+        url: cloudinaryResponse.secure_url,
+      };
+    }
+
+    const application = await Application.create({
+      name,
+      email,
+      phone,
+      address,
+      coverLetter,
+      resume: resumeData,
+      applicantID: {
+        user: req.user._id,
+        role: "Job Seeker",
+      },
+      employerID: {
+        user: jobDetails.postedBy,
+        role: "Employer",
+      },
+      jobId,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Application Submitted!",
+      application,
+    });
+  } catch (error) {
+    console.error("Error in postApplication:", error.stack);
+    return next(new ErrorHandler(`Failed to submit application: ${error.message}`, 500));
   }
-
-  const application = await Application.create({
-    name,
-    email,
-    phone,
-    address,
-    coverLetter,
-    resume: resumeData,
-    applicantID: {
-      user: req.user._id,
-      role: "Job Seeker",
-    },
-    employerID: {
-      user: jobDetails.postedBy,
-      role: "Employer",
-    },
-  });
-
-  res.status(200).json({
-    success: true,
-    message: "Application Submitted!",
-    application,
-  });
 });
 
 // Employer views all applications
