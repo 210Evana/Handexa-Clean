@@ -148,15 +148,19 @@ const MyJobs = () => {
                           >
                             
   <option value="">Select Category</option>
-  <option value="Cleaners">Cleaners</option>
+  <option value="Cleaners">Cleaning & Domestic Services</option>
   <option value="Chefs & Cooks">Chefs & Cooks</option>
   <option value="Nannies">Nannies</option>
   <option value="Photographers">Photographers</option>
   <option value="Househelps">Househelps</option>
+  <option value="Laundry Services">Laundry Services </option>
   <option value="Construction Workers">Construction Workers</option>
   <option value="Artisans">Artisans</option>
   <option value="Gardeners">Gardeners</option>
-  <option value="Plumbers and Electricians">Plumbers and Electricians</option>
+  <option value="Electrical & Wiring Services">Electrical & Wiring Services</option>
+  <option value="Tailoring & Fashion Design">Tailoring & Fashion Design</option>
+  <option value="Carpentry & Furniture">Carpentry & Furniture</option>
+  <option value="Plumbing & Repairs">Plumbing & Repairs</option>
   <option value="Masseuse/Masseur">Masseuse/Masseur</option>
   <option value="Event Planners">Event Planners</option>
   <option value="Nail Technicians">Nail Technicians</option>
@@ -164,7 +168,8 @@ const MyJobs = () => {
   <option value="Fumigators">Fumigators</option>
   <option value="Painter">Painter</option>
   <option value="Drivers">Drivers</option>
-  <option value="Agricultural Workers">Agricultural Workers</option>
+  <option value="Farming & Agriculture">Farming & Agriculture</option>
+  <option value="Food Vending & Catering">Food Vending & Catering</option>
 </select>
                           
                         </div>
