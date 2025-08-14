@@ -77,7 +77,7 @@ export const employerGetAllApplications = catchAsyncErrors(async (req, res, next
   // const { _id } = req.user;
   const applications = await Application.find({ "employerID.user": req.user._id })
     .populate("job", "title company location")
-    .populate("applicantID.user", "name email phone");
+    .populate("applicantID.user", "name email phone")
     .populate("employerID.user", "name email");
   res.status(200).json({ success: true, applications });
 });
