@@ -18,13 +18,8 @@ const PopularCompanies = () => {
       openPositions: 8,
       icon: <FaTruck aria-hidden="true" />,
     },
-    {
-      id: 3,
-      title: "Kisumu Food Market",
-      location: "Kisumu Central, Kisumu, Kenya",
-      openPositions: 12,
-      icon: <FaShop aria-hidden="true" />,
-    },
+    
+     
   ]);
 
   useEffect(() => {
