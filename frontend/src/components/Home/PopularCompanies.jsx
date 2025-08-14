@@ -30,7 +30,7 @@ const PopularCompanies = () => {
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        const { data } = await axios.get("http://localhost:4000/api/v1/job/getall");
+        const { data } = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/job/getall`);
         const employerJobs = data.jobs.reduce((acc, job) => {
           const employerId = job.postedBy.toString();
           if (!acc[employerId]) {
