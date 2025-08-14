@@ -17,18 +17,19 @@ const Application = () => {
   const navigateTo = useNavigate();
   const { id } = useParams();
 
-
-  // Function to handle file input changes
   const handleFileChange = (event) => {
     const resume = event.target.files[0];
     setResume(resume);
   };
 
-  
-const handleApplication = async (e) => {
+  const handleApplication = async (e) => {
     e.preventDefault();
     if (!coverLetter) {
       toast.error("Please provide a cover letter.");
+      return;
+    }
+    if (!id) {
+      toast.error("Job ID is missing.");
       return;
     }
     const formData = new FormData();
@@ -37,14 +38,14 @@ const handleApplication = async (e) => {
     formData.append("phone", phone);
     formData.append("address", address);
     formData.append("coverLetter", coverLetter);
+    formData.append("jobId", id);
     if (resume) {
       formData.append("resume", resume);
     }
-    formData.append("jobId", id);
 
     try {
       const { data } = await axios.post(
-       `${import.meta.env.VITE_BACKEND_URL}/api/v1/application/post`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/v1/application/post`,
         formData,
         {
           withCredentials: true,
@@ -62,6 +63,7 @@ const handleApplication = async (e) => {
       toast.success(data.message);
       navigateTo("/job/getall");
     } catch (error) {
+      console.error("Application submission error:", error);
       toast.error(error.response?.data?.message || "Application failed");
     }
   };
@@ -83,7 +85,6 @@ const handleApplication = async (e) => {
             onChange={(e) => setName(e.target.value)}
             required
           />
-
           <input
             type="email"
             placeholder="Your Email"
@@ -91,7 +92,6 @@ const handleApplication = async (e) => {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-
           <input
             type="number"
             placeholder="Your Phone Number"
@@ -99,34 +99,33 @@ const handleApplication = async (e) => {
             onChange={(e) => setPhone(e.target.value)}
             required
           />
-
           <input
             type="text"
             placeholder="Your Address"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
-
+            required
           />
           <textarea
-            placeholder="CoverLetter (Optional)"
+            placeholder="Cover Letter"
             value={coverLetter}
             onChange={(e) => setCoverLetter(e.target.value)}
+            required
           />
           <div>
-            
             <label style={{ textAlign: "start", display: "block", fontSize: "20px" }}>
-              Select Resume
+              Select Resume (Optional)
             </label>
             <input
               type="file"
-              accept=".pdf, .jpg, .png, .webp"
+              accept=".png,.jpg,.jpeg,.webp"
               onChange={handleFileChange}
               style={{ width: "100%" }}
-              required
             />
           </div>
-
-           <button type="submit" style={{ background: "#e232bcff" }}>Send Application</button>
+          <button type="submit" style={{ background: "#e232bcff" }}>
+            Send Application
+          </button>
         </form>
       </div>
     </section>

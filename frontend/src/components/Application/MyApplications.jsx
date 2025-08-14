@@ -58,7 +58,7 @@ const MyApplications = () => {
   const handleStatusChange = async (applicationId, newStatus) => {
     try {
       const { data } = await axios.put(
-        `${import.meta.env.VITE_BACKEND_URL}/api/v1/application/status/${applicationId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/v1/application/status/${id}`,
         { status: newStatus },
         { withCredentials: true }
       );
