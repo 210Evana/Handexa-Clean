@@ -69,30 +69,30 @@ export const postApplication = catchAsyncErrors(async (req, res, next) => {
 });
 
 // Employer views all applications
-export const employerGetAllApplications = catchAsyncErrors(async (req, res, next) => {
-  const { role } = req.user;
-  if (role === "Job Seeker") {
-    return next(new ErrorHandler("Job Seeker not allowed to access this resource.", 400));
-  }
-  // const { _id } = req.user;
-  const applications = await Application.find({ "employerID.user": req.user._id })
-    .populate("job", "title company location")
-    .populate("applicantID.user", "name email phone")
-    .populate("employerID.user", "name email");
-  res.status(200).json({ success: true, applications });
-});
-// Job Seeker views their applications
 export const jobseekerGetAllApplications = catchAsyncErrors(async (req, res, next) => {
   const { role } = req.user;
   if (role === "Employer") {
     return next(new ErrorHandler("Employer not allowed to access this resource.", 400));
   }
-  //const { _id } = req.user;
-  const applications = await Application.find({ "applicantID.user": req.user._id });
+  // const { _id } = req.user;
+  const applications = await Application.find({ "applicantID.user": req.user._id })
     .populate("jobId", "title company location")
     .populate("applicantID.user", "name email phone")
-    .populate("employerID.user", "name email");  
+    .populate("employerID.user", "name email");
+  res.status(200).json({ success: true, applications });
+});
 
+
+export const employerGetAllApplications = catchAsyncErrors(async (req, res, next) => {
+  const { role } = req.user;
+  if (role === "Job Seeker") {
+    return next(new ErrorHandler("Job Seeker not allowed to access this resource.", 400));
+  }
+// const { _id } = req.user;
+  const applications = await Application.find({ "employerID.user": req.user._id })
+    .populate("jobId", "title company location")
+    .populate("applicantID.user", "name email phone")
+    .populate("employerID.user", "name email");
   res.status(200).json({ success: true, applications });
 });
 
