@@ -49,7 +49,7 @@ export const postApplication = catchAsyncErrors(async (req, res, next) => {
     email,
     phone,
     address,
-    coverLetter: coverLetter || null,
+    coverLetter,
     resume: resumeData,
     applicantID: {
       user: req.user._id,
