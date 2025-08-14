@@ -59,7 +59,7 @@ const PopularCategories = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const { data } = await axios.get("http://localhost:4000/api/v1/job/getall");
+        const { data } = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/job/getall`);
         const jobCategories = [...new Set(data.jobs.map((job) => job.category))];
         const mappedCategories = jobCategories.slice(0, 8).map((category, index) => ({
           id: index + 1,
