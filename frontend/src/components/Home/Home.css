@@ -1,0 +1,148 @@
+.homePage {
+  font-family: 'Poppins', sans-serif;
+  background: url('https://images.unsplash.com/photo-1625225233840-7f1120a5e139?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
+  min-height: 100vh;
+  color: #333;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.heroSection {
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1625225233840-7f1120a5e139?q=80&w=2070&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+  text-align: center;
+  padding: 100px 20px;
+  border-radius: 10px;
+  margin-bottom: 40px;
+}
+
+.heroSection h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.heroSection p {
+  font-size: 1.2rem;
+  max-width: 600px;
+  margin: 0 auto 30px;
+}
+
+.heroSection .cta .btn {
+  background: #2e7d32; /* Kenyan green */
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: 600;
+  margin: 0 10px;
+  transition: background 0.3s;
+}
+
+.heroSection .cta .btn.secondary {
+  background: #d32f2f; /* Kenyan red */
+}
+
+.heroSection .cta .btn:hover {
+  background: #1b5e20;
+}
+
+.heroSection .cta .btn.secondary:hover {
+  background: #b71c1c;
+}
+
+.howitworks, .categories, .companies {
+  margin: 40px 0;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 10px;
+  padding: 30px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.howitworks h3, .categories h3, .companies h3 {
+  text-align: center;
+  color: #2e7d32;
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.howitworks .banner, .categories .banner, .companies .banner {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card .icon {
+  font-size: 3rem;
+  color: #d32f2f;
+  margin-bottom: 10px;
+}
+
+.card p {
+  font-size: 1rem;
+  color: #555;
+}
+
+.card .text p:first-child {
+  font-weight: 600;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.companies .card button {
+  background: #2e7d32;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.companies .card button:hover {
+  background: #1b5e20;
+}
+
+@media (max-width: 768px) {
+  .heroSection h1 {
+    font-size: 2rem;
+  }
+  .heroSection p {
+    font-size: 1rem;
+  }
+  .heroSection .cta .btn {
+    display: block;
+    margin: 10px auto;
+    width: fit-content;
+  }
+  .howitworks h3, .categories h3, .companies h3 {
+    font-size: 2rem;
+  }
+  .card {
+    padding: 15px;
+  }
+}
+

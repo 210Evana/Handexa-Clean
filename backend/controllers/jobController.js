@@ -3,12 +3,13 @@ import { Job } from "../models/jobSchema.js";
 import ErrorHandler from "../middlewares/error.js";
 
 export const getAllJobs = catchAsyncErrors(async (req, res, next) => {
-  const jobs = await Job.find({ expired: false });
+  const jobs = await Job.find({ expired: false }).populate("postedBy", "name email city");
   res.status(200).json({
     success: true,
     jobs,
   });
 });
+
 
 export const postJob = catchAsyncErrors(async (req, res, next) => {
   const { role } = req.user;
@@ -126,7 +127,7 @@ export const deleteJob = catchAsyncErrors(async (req, res, next) => {
 export const getSingleJob = catchAsyncErrors(async (req, res, next) => {
   const { id } = req.params;
   try {
-    const job = await Job.findById(id);
+    const job = await Job.findById(id).populate("postedBy", "name email city");
     if (!job) {
       return next(new ErrorHandler("Job not found.", 404));
     }
