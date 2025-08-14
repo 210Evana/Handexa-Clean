@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaStore, FaTruck, FaShop } from "react-icons/fa";
+import { FaStore, FaTruck } from "react-icons/fa";
 import axios from "axios";
 
 const PopularCompanies = () => {
@@ -62,7 +62,7 @@ const PopularCompanies = () => {
     const icons = [
       <FaStore aria-hidden="true" />,
       <FaTruck aria-hidden="true" />,
-      <FaShop aria-hidden="true" />,
+      //<FaShop aria-hidden="true" />,
     ];
     return icons[index % icons.length];
   };
