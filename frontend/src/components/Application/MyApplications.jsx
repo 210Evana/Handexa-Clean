@@ -58,27 +58,29 @@ const deleteApplication = async (id) => {
    // ... (previous imports and MyApplications component remain the same)
 
 const handleStatusChange = async (applicationId, newStatus) => {
-    try {
-      const { data } = await axios.put(
-        `${import.meta.env.VITE_BACKEND_URL}/api/v1/application/status/${applicationId}`,
-        { status: newStatus },
-        { withCredentials: true }
-      );
-      toast.success(data.message);
-      setApplications((prev) =>
-        prev.map((application) =>
-          application._id === applicationId
-            ? { ...application, status: newStatus }
-            : application
-        )
-      );
-      if (newStatus === "accepted") {
-        toast.success("Payment initiated (pending confirmation)");
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to update status");
+  try {
+    const { data } = await axios.put(
+      `${import.meta.env.VITE_BACKEND_URL}/api/v1/application/status/${applicationId}`,
+      { status: newStatus },
+      { withCredentials: true }
+    );
+    toast.success(data.message);
+    setApplications((prev) =>
+      prev.map((application) =>
+        application._id === applicationId
+          ? { ...application, status: newStatus }
+          : application
+      )
+    );
+    if (newStatus === "accepted") {
+      toast.success("Payment initiated (pending confirmation)");
     }
-  };
+  } catch (error) {
+    console.error("Status update error:", error);
+    toast.error(error.response?.data?.message || "Failed to update status");
+  }
+};
+
 
 // ... (rest of the component remains the same)
 
@@ -146,17 +148,21 @@ const JobSeekerCard = ({ element, deleteApplication, openModal, navigateTo }) =>
                 element.status === "accepted" ? "green" : element.status === "rejected" ? "red" : "orange",
             }}
           >
-            {element.status}
+            {element.status || "Pending"}
           </strong>
         </p>
       </div>
       <div className="resume">
+        {element.resume?.url ? (
         <img
           src={element.resume.url}
           alt="resume"
           onClick={() => openModal(element.resume.url)}
           style={{ cursor: "pointer" }}
         />
+        ):(
+          <p>No resume available</p>
+        )}
       </div>
       <div className="btn_area">
         <button onClick={() => deleteApplication(element._id)}>Delete Application</button>
@@ -179,18 +185,18 @@ const EmployerCard = ({ element, openModal, handleStatusChange, navigateTo }) =>
         <p><span>Address:</span> {element.address}</p>
         <p><span>Cover Letter:</span> {element.coverLetter || "None"}</p>
         <p>
-          <span>Status:</span>
+           <span>Status:</span>
           <strong
             style={{
               color:
                 element.status === "accepted" ? "green" : element.status === "rejected" ? "red" : "orange",
             }}
           >
-            {element.status}
+            {element.status || "Pending"}
           </strong>
         </p>
         <select
-          value={element.status}
+          value={element.status || "pending"}
           onChange={(e) => handleStatusChange(element._id, e.target.value)}
           style={{ background: "#e6f7fc", borderRadius: "6px", padding: "8px" }}
         >
@@ -200,12 +206,16 @@ const EmployerCard = ({ element, openModal, handleStatusChange, navigateTo }) =>
         </select>
       </div>
       <div className="resume">
+        {element.resume?.url ? ( 
         <img
           src={element.resume.url}
           alt="resume"
           onClick={() => openModal(element.resume.url)}
           style={{ cursor: "pointer" }}
-        />
+          />
+        ) : (
+           <p>No resume available</p>
+        )}
       </div>
       <div className="btn_area">
         <button
