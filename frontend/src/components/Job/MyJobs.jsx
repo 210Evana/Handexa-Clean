@@ -114,40 +114,24 @@ const MyJobs = () => {
                         </div>
                         <div>
                           {" "}
-                          <span>Country:</span>
+                          <span>county:</span>
                           <input
                             type="text"
                             disabled={
                               editingMode !== element._id ? true : false
                             }
-                            value={element.country}
+                            value={element.county}
                             onChange={(e) =>
                               handleInputChange(
                                 element._id,
-                                "country",
+                                "county",
                                 e.target.value
                               )
                             }
                           />
                         </div>
                         <div>
-                          <span>City:</span>
-                          <input
-                            type="text"
-                            disabled={
-                              editingMode !== element._id ? true : false
-                            }
-                            value={element.city}
-                            onChange={(e) =>
-                              handleInputChange(
-                                element._id,
-                                "city",
-                                e.target.value
-                              )
-                            }
-                          />
-                        </div>
-                        <div>
+                          
                           <span>Category:</span>
                           <select
                             value={element.category}

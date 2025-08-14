@@ -3,7 +3,7 @@ import { Job } from "../models/jobSchema.js";
 import ErrorHandler from "../middlewares/error.js";
 
 export const getAllJobs = catchAsyncErrors(async (req, res, next) => {
-  const jobs = await Job.find({ expired: false }).populate("postedBy", "name email city");
+  const jobs = await Job.find({ expired: false }).populate("postedBy", "name email county");
   res.status(200).json({
     success: true,
     jobs,
@@ -22,15 +22,14 @@ export const postJob = catchAsyncErrors(async (req, res, next) => {
     title,
     description,
     category,
-    country,
-    city,
+    county,
     location,
     fixedSalary,
     salaryFrom,
     salaryTo,
   } = req.body;
 
-  if (!title || !description || !category || !country || !city || !location) {
+  if (!title || !description || !category || !county || !location) {
     return next(new ErrorHandler("Please provide full job details.", 400));
   }
 
@@ -53,8 +52,7 @@ export const postJob = catchAsyncErrors(async (req, res, next) => {
     title,
     description,
     category,
-    country,
-    city,
+    county,
     location,
     fixedSalary,
     salaryFrom,
@@ -127,7 +125,7 @@ export const deleteJob = catchAsyncErrors(async (req, res, next) => {
 export const getSingleJob = catchAsyncErrors(async (req, res, next) => {
   const { id } = req.params;
   try {
-    const job = await Job.findById(id).populate("postedBy", "name email city");
+    const job = await Job.findById(id).populate("postedBy", "name email county");
     if (!job) {
       return next(new ErrorHandler("Job not found.", 404));
     }

@@ -39,11 +39,9 @@ const JobDetails = () => {
             Category: <span>{job.category}</span>
           </p>
           <p>
-            Country: <span>{job.country}</span>
+            County: <span>{job.county}</span>
           </p>
-          <p>
-            City: <span>{job.city}</span>
-          </p>
+          
           <p>
             Location: <span>{job.location}</span>
           </p>

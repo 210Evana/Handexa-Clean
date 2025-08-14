@@ -8,8 +8,8 @@ const PostJob = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
-  const [country, setCountry] = useState("");
-  const [city, setCity] = useState("");
+  const [county, setcounty] = useState("");
+
   const [location, setLocation] = useState("");
   const [salaryFrom, setSalaryFrom] = useState("");
   const [salaryTo, setSalaryTo] = useState("");
@@ -38,8 +38,7 @@ const PostJob = () => {
               title,
               description,
               category,
-              country,
-              city,
+              county,
               location,
               fixedSalary,
             }
@@ -47,8 +46,7 @@ const PostJob = () => {
               title,
               description,
               category,
-              country,
-              city,
+              county,
               location,
               salaryFrom,
               salaryTo,
@@ -115,16 +113,11 @@ const PostJob = () => {
             <div className="wrapper">
               <input
                 type="text"
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-                placeholder="Country"
+                value={county}
+                onChange={(e) => setcounty(e.target.value)}
+                placeholder="county"
               />
-              <input
-                type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="City"
-              />
+             
             </div>
             <input
               type="text"

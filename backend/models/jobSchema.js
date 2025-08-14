@@ -28,14 +28,10 @@ const jobSchema = new mongoose.Schema({
       "Other Informal Jobs",
     ],
   },
-  country: {
+  
+  county: {
     type: String,
-    required: [true, "Please provide a country name."],
-    default: "Kenya",
-  },
-  city: {
-    type: String,
-    required: [true, "Please provide a city name."],
+    required: [true, "Please provide a county name."],
     enum: [
       "Nairobi",
       "Mombasa",
