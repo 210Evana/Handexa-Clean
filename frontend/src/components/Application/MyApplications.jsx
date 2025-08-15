@@ -111,7 +111,7 @@ const MyApplications = () => {
             user?.role === "Job Seeker" ? (
               <JobSeekerCard
                 element={element}
-                key={element._id}
+                key={element._id || Math.random()} //fallback key
                 deleteApplication={deleteApplication}
                 openModal={openModal}
                 navigateTo={navigateTo}
@@ -119,7 +119,7 @@ const MyApplications = () => {
             ) : (
               <EmployerCard
                 element={element}
-                key={element._id}
+                key={element._id || Math.random()}
                 openModal={openModal}
                 handleStatusChange={handleStatusChange}
                 navigateTo={navigateTo}
@@ -177,6 +177,10 @@ const JobSeekerCard = ({ element, deleteApplication, openModal, navigateTo }) =>
 };
 
 const EmployerCard = ({ element, openModal, handleStatusChange, navigateTo }) => {
+  if (!element._id) {
+    console.warn("Missing _id for application:", element);
+    return null; // Skip rendering if _id is missing
+  }
   return (
     <div className="job_seeker_card">
       <div className="detail">

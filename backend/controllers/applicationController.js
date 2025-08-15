@@ -3,6 +3,7 @@ import ErrorHandler from "../middlewares/error.js";
 import { Application } from "../models/applicationSchema.js";
 import { Job } from "../models/jobSchema.js";
 import cloudinary from "cloudinary";
+import mongoose from "mongoose";
 
 // Job Seeker applies for a job
 export const postApplication = catchAsyncErrors(async (req, res, next) => {
@@ -109,7 +110,7 @@ export const employerGetAllApplications = catchAsyncErrors(async (req, res, next
       path: "jobId",
       select: "title category county location",
     }).populate("applicantID.user", "name email");
-    console.log("Fetched applications for employer:", applications);
+    console.log("Applications with IDs:", applications.map(app => ({ _id: app._id, jobId: app.jobId })));
     res.status(200).json({
       success: true,
       applications,
