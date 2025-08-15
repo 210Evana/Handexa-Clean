@@ -1,3 +1,4 @@
+// SearchResults.jsx
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
@@ -19,7 +20,7 @@ const SearchResults = () => {
         );
         setJobs(res.data.jobs);
       } catch (err) {
-        toast.error("No jobs found.");
+        toast.error("No jobs found for your search.");
       }
     };
 
@@ -27,12 +28,16 @@ const SearchResults = () => {
   }, [location.search]);
 
   return (
-    <div className="job-list-container">
+    <div style={{ padding: "20px" }}>
       <h2>Search Results</h2>
       {jobs.length === 0 ? (
-        <p>No jobs found matching your criteria.</p>
+        <p>No jobs found.</p>
       ) : (
-        jobs.map((job) => <JobCard key={job._id} job={job} />)
+        <ul>
+          {jobs.map((job) => (
+            <li key={job._id}>{job.title} - {job.county}</li>
+          ))}
+        </ul>
       )}
     </div>
   );

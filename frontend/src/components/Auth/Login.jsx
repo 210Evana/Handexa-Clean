@@ -33,6 +33,14 @@ const Login = () => {
       toast.error(error.response?.data?.message || "Login failed");
     }
   };
+  // Redirect based on role
+if (isAuthorized && user) {
+  if (user.role === "Admin") {
+    return <Navigate to="/admin/dashboard" />;
+  } else {
+    return <Navigate to="/" />;
+  }
+}
 
   if (isAuthorized) return <Navigate to="/" />;
 
