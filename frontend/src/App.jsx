@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from "react";
 import "./App.css";
 import { Context } from "./main";
-import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom"; // ✅ added useNavigate
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Login from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
 import { Toaster } from "react-hot-toast";
@@ -18,38 +18,38 @@ import NotFound from "./components/NotFound/NotFound";
 import MyJobs from "./components/Job/MyJobs";
 import MessagePage from "./components/Messages/MessagePage";
 import AdminDashboard from "./components/Admin/AdminDashboard";
+//import EditProfile from "./components/Auth/editProfile"; // Import EditProfile
 import Contact from "./components/Contact/Contact.jsx";
 import SearchResults from "./components/Job/SearchResults";
 
+
+
+
 const App = () => {
   const { isAuthorized, setIsAuthorized, setUser } = useContext(Context);
-  const navigate = useNavigate(); // ✅ added navigate
-
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/getuser`,
-          { withCredentials: true }
+          "http://localhost:4000/api/v1/user/getuser",
+          {
+            withCredentials: true,
+          }
         );
         setUser(response.data.user);
         setIsAuthorized(true);
-      } catch (error) {
-        setIsAuthorized(false);
-        if (error.response?.status === 401) {
-          navigate("/login");
-        }
-      }
-    };
-
+     } catch (error) {
+     setIsAuthorized(false); 
+      if (error.response?.status === 401)
+      { navigate("/login"); 
+} } 
     fetchUser();
-  }, []);
+  }, [isAuthorized, setIsAuthorized, setUser]);
 
   return (
     <>
       <BrowserRouter>
         <Navbar />
-        {/* Main content will be rendered here */}
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
