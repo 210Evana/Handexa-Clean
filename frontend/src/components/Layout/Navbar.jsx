@@ -1,44 +1,37 @@
 import React, { useContext, useState, useEffect } from "react";
 import { Context } from "../../main";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { FaHome, FaBriefcase, FaFileAlt, FaPlus, FaList } from "react-icons/fa";
+import { FaHome, FaBriefcase, FaFileAlt, FaPlus, FaList, FaEnvelope } from "react-icons/fa";
 import "./Navbar.css";
 
 const Navbar = () => {
   const [show, setShow] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const { isAuthorized, setIsAuthorized, user, setUser } = useContext(Context);
   const navigateTo = useNavigate();
+  const location = useLocation();
 
-  // Debug user data and state
-  useEffect(() => {
-    console.log("Navbar user:", user);
-    console.log("Navbar isAuthorized:", isAuthorized);
-  }, [user, isAuthorized]);
-
-  const fetchUser = async () => {
-    try {
-      const response = await axios.get(
-       `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/getuser`,
-        { withCredentials: true }
-      );
-      console.log("Fetch user response:", response.data);
-      setUser(response.data.user);
-      setIsAuthorized(true);
-    } catch (error) {
-      console.error("Fetch user error:", error);
-      setIsAuthorized(false);
-    }
-  };
-
-  // ✅ fetch user when navbar loads
   useEffect(() => {
     if (isAuthorized) {
       fetchUser();
     }
   }, [isAuthorized]);
+
+  const fetchUser = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/getuser`,
+        { withCredentials: true }
+      );
+      setUser(response.data.user);
+      setIsAuthorized(true);
+    } catch (error) {
+      setIsAuthorized(false);
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -52,6 +45,14 @@ const Navbar = () => {
     } catch (error) {
       toast.error(error.response?.data?.message || "Logout failed");
       setIsAuthorized(true);
+    }
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      navigateTo(`/job/search?query=${encodeURIComponent(searchTerm)}`);
+      setSearchTerm("");
     }
   };
 
@@ -83,8 +84,8 @@ const Navbar = () => {
                   <FaFileAlt className="nav-icon" />
                   <span className="nav-text">
                     {user?.role === "Employer"
-                      ? "applicant's applications"
-                      : "my applications"}
+                      ? "Applicant's Applications"
+                      : "My Applications"}
                   </span>
                 </Link>
               </li>
@@ -93,13 +94,13 @@ const Navbar = () => {
                   <li>
                     <Link to="/job/post" onClick={() => setShow(false)}>
                       <FaPlus className="nav-icon" />
-                      <span className="nav-text">Post job</span>
+                      <span className="nav-text">Post Job</span>
                     </Link>
                   </li>
                   <li>
                     <Link to="/job/me" onClick={() => setShow(false)}>
                       <FaList className="nav-icon" />
-                      <span className="nav-text">View your jobs</span>
+                      <span className="nav-text">Your Jobs</span>
                     </Link>
                   </li>
                 </>
@@ -115,7 +116,28 @@ const Navbar = () => {
               </Link>
             </li>
           )}
+
+          <li>
+            <Link to="/contact" onClick={() => setShow(false)}>
+              <FaEnvelope className="nav-icon" />
+              <span className="nav-text">Contact Us</span>
+            </Link>
+          </li>
         </ul>
+
+        {/* Search bar for Job Seekers */}
+        {user?.role === "Job Seeker" && location.pathname.startsWith("/job") && (
+          <form className="search-form" onSubmit={handleSearch}>
+            <input
+              type="text"
+              placeholder="Search by salary, category..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+            <button type="submit" className="search-btn">Search</button>
+          </form>
+        )}
 
         <div className="profile-section">
           <div className="profile-container">
