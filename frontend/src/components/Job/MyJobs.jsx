@@ -148,7 +148,7 @@ const MyJobs = () => {
                           >
                             
   <option value="">Select Category</option>
-  <option value="Cleaners">Cleaning & Domestic Services</option>
+  <option value="Cleaning & Domestic Services">Cleaning & Domestic Services</option>
   <option value="Chefs & Cooks">Chefs & Cooks</option>
   <option value="Nannies">Nannies</option>
   <option value="Photographers">Photographers</option>
