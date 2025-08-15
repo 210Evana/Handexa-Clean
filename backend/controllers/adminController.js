@@ -70,7 +70,7 @@ export const adminGetAllApplications = catchAsyncErrors(
       paymentStatus: app.paymentStatus || "unpaid",
     }));
 
-    res.status(200).json({ success: true, applications: formattedApps });
+    res.status(200).json({ success: true, application: formattedApps });
   }
 );
 
