@@ -43,6 +43,11 @@ const MyApplications = () => {
   }
 
   const deleteApplication = async (id) => {
+    if (!id) {
+      console.error("Delete application called with undefined ID");
+      toast.error("Invalid application ID for deletion");
+      return;
+    }
     try {
       const { data } = await axios.delete(
         `${import.meta.env.VITE_BACKEND_URL}/api/v1/application/delete/${id}`,
@@ -57,37 +62,40 @@ const MyApplications = () => {
   };
 
   const handleStatusChange = async (applicationId, newStatus) => {
-  console.log("handleStatusChange called with applicationId:", applicationId, "newStatus:", newStatus);
-  if (!applicationId) {
-    toast.error("Application ID is undefined. Please try again.");
-    return;
-  }
-  try {
-    const { data } = await axios.put(
-      `${import.meta.env.VITE_BACKEND_URL}/api/v1/application/status/${applicationId}`,
-      { status: newStatus },
-      { withCredentials: true }
-    );
-    toast.success(data.message);
-    setApplications((prev) =>
-      prev.map((application) =>
-        application._id === applicationId
-          ? { ...application, status: newStatus }
-          : application
-      )
-    );
-    if (newStatus === "accepted") {
-      toast.success("Payment initiated (pending confirmation)");
+    console.log("handleStatusChange called with applicationId:", applicationId, "newStatus:", newStatus);
+    if (!applicationId) {
+      console.error("Application ID is undefined in handleStatusChange");
+      toast.error("Application ID is undefined. Please try again.");
+      return;
     }
-  } catch (error) {
-    console.error("Status update error:", error);
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      "Failed to update status. Please try again.";
-    toast.error(errorMessage);
-  }
-};
+    try {
+      const url = `${import.meta.env.VITE_BACKEND_URL}/api/v1/application/status/${applicationId}`;
+      console.log("Sending PUT request to:", url);
+      const { data } = await axios.put(
+        url,
+        { status: newStatus },
+        { withCredentials: true }
+      );
+      toast.success(data.message);
+      setApplications((prev) =>
+        prev.map((application) =>
+          application._id === applicationId
+            ? { ...application, status: newStatus }
+            : application
+        )
+      );
+      if (newStatus === "accepted") {
+        toast.success("Payment initiated (pending confirmation)");
+      }
+    } catch (error) {
+      console.error("Status update error:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to update status. Please try again.";
+      toast.error(errorMessage);
+    }
+  };
 
   const openModal = (imageUrl) => {
     setResumeImageUrl(imageUrl);
@@ -107,23 +115,28 @@ const MyApplications = () => {
         ) : applications.length <= 0 ? (
           <h4>No Applications Found</h4>
         ) : (
-          applications.map((element) =>
+          applications.map((element, index) =>
             user?.role === "Job Seeker" ? (
               <JobSeekerCard
                 element={element}
-                key={element._id || Math.random()} //fallback key
+                key={element._id || `jobseeker-${index}`}
                 deleteApplication={deleteApplication}
                 openModal={openModal}
                 navigateTo={navigateTo}
               />
             ) : (
-              <EmployerCard
-                element={element}
-                key={element._id || Math.random()}
-                openModal={openModal}
-                handleStatusChange={handleStatusChange}
-                navigateTo={navigateTo}
-              />
+              element._id ? (
+                <EmployerCard
+                  element={element}
+                  key={element._id}
+                  openModal={openModal}
+                  handleStatusChange={handleStatusChange}
+                  navigateTo={navigateTo}
+                />
+              ) : (
+                console.warn("Skipping application due to missing _id:", JSON.stringify(element, null, 2)),
+                null
+              )
             )
           )
         )}
@@ -177,9 +190,9 @@ const JobSeekerCard = ({ element, deleteApplication, openModal, navigateTo }) =>
 };
 
 const EmployerCard = ({ element, openModal, handleStatusChange, navigateTo }) => {
-  if (!element._id) {
-    console.warn("Missing _id for application:", element);
-    return null; // Skip rendering if _id is missing
+if (!element._id) {
+    console.warn("Missing _id for application:", JSON.stringify(element, null, 2));
+    return null;
   }
   return (
     <div className="job_seeker_card">

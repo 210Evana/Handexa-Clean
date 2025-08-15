@@ -115,12 +115,16 @@ export const employerGetAllApplications = catchAsyncErrors(async (req, res, next
     console.log(
       "Applications with IDs:",
       applications.map((app) => ({
-        _id: app._id,
-        jobId: app.jobId,
-        applicantID: app.applicantID,
-        employerID: app.employerID,
+        _id: app._id?.toString(),
+        jobId: app.jobId?._id?.toString(),
+        applicantID: app.applicantID?.user?._id?.toString(),
+        employerID: app.employerID?.user?.toString(),
+        status: app.status,
       }))
     );
+    if (!applications.length) {
+      console.warn("No applications found for employer:", req.user._id.toString());
+    }
     res.status(200).json({
       success: true,
       applications,
@@ -166,29 +170,32 @@ export const updateApplicationStatus = catchAsyncErrors(async (req, res, next) =
     }
 
     const { applicationId } = req.params;
-    console.log("Received applicationId:", applicationId); // Debug log
-    console.log("Employer ID:", req.user._id);
+    console.log("Received request URL:", req.url);
+    console.log("Received applicationId:", applicationId, "Employer ID:", req.user._id.toString());
 
-     if (!applicationId) {
+    if (!applicationId) {
+      console.error("Application ID is undefined in request:", req.url);
       return next(new ErrorHandler("Application ID is undefined", 400));
     }
-     if (!mongoose.Types.ObjectId.isValid(applicationId)) {
+
+    if (!mongoose.Types.ObjectId.isValid(applicationId)) {
+      console.error("Invalid application ID format:", applicationId);
       return next(new ErrorHandler("Invalid application ID format", 400));
-    }
-    
-    const { status } = req.body;
-    if (!["pending", "accepted", "rejected"].includes(status)) {
-      return next(new ErrorHandler("Invalid status value", 400));
     }
 
     const application = await Application.findById(applicationId);
     if (!application) {
-      console.log("No application found for ID:", applicationId); // Debug log
+      console.log("No application found for ID:", applicationId);
       return next(new ErrorHandler("Application not found", 404));
     }
 
     if (application.employerID.user.toString() !== req.user._id.toString()) {
       return next(new ErrorHandler("Not authorized to update this application", 403));
+    }
+
+    const { status } = req.body;
+    if (!["pending", "accepted", "rejected"].includes(status)) {
+      return next(new ErrorHandler("Invalid status value", 400));
     }
 
     application.status = status;
