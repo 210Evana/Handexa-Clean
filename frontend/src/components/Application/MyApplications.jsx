@@ -56,28 +56,32 @@ const MyApplications = () => {
   };
 
   const handleStatusChange = async (applicationId, newStatus) => {
-    try {
-      const { data } = await axios.put(
-        `${import.meta.env.VITE_BACKEND_URL}/api/v1/application/status/${id}`,
-        { status: newStatus },
-        { withCredentials: true }
-      );
-      toast.success(data.message);
-      setApplications((prev) =>
-        prev.map((application) =>
-          application._id === applicationId
-            ? { ...application, status: newStatus }
-            : application
-        )
-      );
-      if (newStatus === "accepted") {
-        toast.success("Payment initiated (pending confirmation)");
-      }
-    } catch (error) {
-      console.error("Status update error:", error);
-      toast.error(error.response?.data?.message || "Failed to update status");
+  try {
+    const { data } = await axios.put(
+      `${import.meta.env.VITE_BACKEND_URL}/api/v1/application/status/${applicationId}`,
+      { status: newStatus },
+      { withCredentials: true }
+    );
+    toast.success(data.message);
+    setApplications((prev) =>
+      prev.map((application) =>
+        application._id === applicationId
+          ? { ...application, status: newStatus }
+          : application
+      )
+    );
+    if (newStatus === "accepted") {
+      toast.success("Payment initiated (pending confirmation)");
     }
-  };
+  } catch (error) {
+    console.error("Status update error:", error);
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to update status. Please try again.";
+    toast.error(errorMessage);
+  }
+};
 
   const openModal = (imageUrl) => {
     setResumeImageUrl(imageUrl);
@@ -128,7 +132,6 @@ const JobSeekerCard = ({ element, deleteApplication, openModal, navigateTo }) =>
     <div className="job_seeker_card">
       <div className="detail">
         <p><span>Job Title:</span> {element.jobId?.title || "Unknown Job"}</p>
-        <p><span>Company:</span> {element.jobId?.company || "Unknown Company"}</p>
         <p><span>Location:</span> {element.jobId?.location || "Unknown Location"}</p>
         <p><span>Name:</span> {element.name || "N/A"}</p>
         <p><span>Email:</span> {element.email || "N/A"}</p>
@@ -172,7 +175,6 @@ const EmployerCard = ({ element, openModal, handleStatusChange, navigateTo }) =>
     <div className="job_seeker_card">
       <div className="detail">
         <p><span>Job Title:</span> {element.jobId?.title || "Unknown Job"}</p>
-        <p><span>Company:</span> {element.jobId?.company || "Unknown Company"}</p>
         <p><span>Location:</span> {element.jobId?.location || "Unknown Location"}</p>
         <p><span>Name:</span> {element.name || "N/A"}</p>
         <p><span>Email:</span> {element.email || "N/A"}</p>

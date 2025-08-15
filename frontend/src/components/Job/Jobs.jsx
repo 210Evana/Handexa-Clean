@@ -14,36 +14,39 @@ const Jobs = () => {
           withCredentials: true,
         })
         .then((res) => {
-          setJobs(res.data);
+          setJobs(res.data.jobs);
         });
     } catch (error) {
       console.log(error);
+      navigateTo("/notfound");
     }
   }, []);
   if (!isAuthorized) {
-    navigateTo("/");
+    navigateTo("/login");
+    return null;
   }
 
   return (
-    <section className="jobs page">
-      <div className="container">
-        <h1>ALL AVAILABLE JOBS</h1>
-        <div className="banner">
-          {jobs.jobs &&
-            jobs.jobs.map((element) => {
-              return (
-                <div className="card" key={element._id}>
-                  <p>{element.title}</p>
-                  <p>{element.category}</p>
-                  <p>{element.county}</p>
-                  <Link to={`/job/${element._id}`}>Job Details</Link>
-                </div>
-              );
-            })}
-        </div>
+  <section className="jobs page">
+    <div className="container">
+      <h1>ALL AVAILABLE JOBS</h1>
+      <div className="banner">
+        {jobs.length > 0 ? (
+          jobs.map((element) => (
+            <div className="card" key={element._id}>
+              <p>{element.title}</p>
+              <p>{element.category}</p>
+              <p>{element.county}</p>
+              <Link to={`/job/${element._id}`}>Job Details</Link>
+            </div>
+          ))
+        ) : (
+          <p>No jobs available</p>
+        )}
       </div>
-    </section>
-  );
+    </div>
+  </section>
+);
 };
 
 export default Jobs;

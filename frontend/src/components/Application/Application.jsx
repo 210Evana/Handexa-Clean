@@ -24,12 +24,8 @@ const Application = () => {
 
   const handleApplication = async (e) => {
     e.preventDefault();
-    if (!coverLetter) {
-      toast.error("Please provide a cover letter.");
-      return;
-    }
-    if (!id) {
-      toast.error("Job ID is missing.");
+    if (!name || !email || !coverLetter || !phone || !address || !id) {
+      toast.error("Please fill in all required fields.");
       return;
     }
     const formData = new FormData();
@@ -64,7 +60,11 @@ const Application = () => {
       navigateTo("/job/getall");
     } catch (error) {
       console.error("Application submission error:", error);
-      toast.error(error.response?.data?.message || "Application failed");
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Application failed. Please try again.";
+      toast.error(errorMessage);
     }
   };
 
@@ -114,7 +114,7 @@ const Application = () => {
           />
           <div>
             <label style={{ textAlign: "start", display: "block", fontSize: "20px" }}>
-              Select Resume (Optional)
+              Select Resume (Optional, PNG/JPG/JPEG/WEBP only)
             </label>
             <input
               type="file"

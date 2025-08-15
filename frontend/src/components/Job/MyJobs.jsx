@@ -170,6 +170,7 @@ const MyJobs = () => {
   <option value="Drivers">Drivers</option>
   <option value="Farming & Agriculture">Farming & Agriculture</option>
   <option value="Food Vending & Catering">Food Vending & Catering</option>
+  <option value="Other Informal Jobs">Other Informal Jobs</option>
 </select>
                           
                         </div>

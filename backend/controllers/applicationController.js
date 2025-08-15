@@ -58,7 +58,7 @@ export const postApplication = catchAsyncErrors(async (req, res, next) => {
         user: jobDetails.postedBy,
         role: "Employer",
       },
-      
+      jobId, //add jobId
     });
 
     res.status(200).json({
@@ -66,8 +66,12 @@ export const postApplication = catchAsyncErrors(async (req, res, next) => {
       message: "Application Submitted!",
       application,
     });
-  } catch (error) {
+   } catch (error) {
     console.error("Error in postApplication:", error.stack);
+    if (error.name === "ValidationError") {
+      const messages = Object.values(error.errors).map((err) => err.message);
+      return next(new ErrorHandler(`Validation failed: ${messages.join(", ")}`, 400));
+    }
     return next(new ErrorHandler(`Failed to submit application: ${error.message}`, 500));
   }
 });
@@ -147,13 +151,13 @@ export const updateApplicationStatus = catchAsyncErrors(async (req, res, next) =
       return next(new ErrorHandler("Job Seeker not allowed to update status", 403));
     }
 
-    const { id } = req.params;
+    const { applicationId } = req.params;
     const { status } = req.body;
     if (!["pending", "accepted", "rejected"].includes(status)) {
       return next(new ErrorHandler("Invalid status value", 400));
     }
 
-    const application = await Application.findById(id);
+    const application = await Application.findById(applicationId);
     if (!application) {
       return next(new ErrorHandler("Application not found", 404));
     }
@@ -166,7 +170,7 @@ export const updateApplicationStatus = catchAsyncErrors(async (req, res, next) =
     await application.save();
 
     if (status === "accepted") {
-      console.log(`Payment initiation placeholder for application ${id}`);
+      console.log(`Payment initiation placeholder for application ${applicantId}`);
       res.status(200).json({
         success: true,
         message: "Application status updated and payment initiated (placeholder)",
