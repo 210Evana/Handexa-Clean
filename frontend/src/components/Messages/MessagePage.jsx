@@ -70,17 +70,22 @@ const MessagePage = () => {
     const fetchApplicationDetails = async () => {
     setIsLoadingApplication(true); // Set loading state
       try {
-        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/application/${applicationId}`, {
-          withCredentials: true,
-        });
-        //console.log("Application received:", res.data.application);
-        setApplication(res.data.application);
-      } catch (error) {
-        console.error("Error fetching application:", error);
-        toast.error("Failed to load application info");
-      } finally {
-        setIsLoadingApplication(false);
-      }
+  const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/application/${applicationId}`, {
+    withCredentials: true,
+  });
+  setApplication(res.data.application);
+} catch (error) {
+  console.error("Error fetching application:", error);
+  setApplication(null); // explicitly mark as not found
+  toast.error(
+    error.response?.status === 403
+      ? "You are not authorized to view this application"
+      : "Application not found"
+  );
+} finally {
+  setIsLoadingApplication(false);
+}
+
     };
     fetchApplicationDetails();
   }, [applicationId]);
@@ -120,15 +125,15 @@ const MessagePage = () => {
   return (
     <div className="message-page">
       {isLoadingApplication ? (
-        <div className="loading">Loading application details...</div>
-      ) : application ? (
-            
-         <div className="chat-header">
-          <h2>Chat: {user.name} ↔ {application.user.name || "Unknown User"}</h2>
-        </div>
-      ):(
-        <div className="error">Application not found</div>
-      )}
+  <div className="loading">Loading application details...</div>
+) : application ? (
+  <div className="chat-header">
+    <h2>Chat: {user.name} ↔ {application.user?.name || "Unknown User"}</h2>
+  </div>
+) : (
+  <div className="error">Application not found or you are not authorized.</div>
+)}
+
       <div className ="chat-container">
         {isLoadingMessages ? (
 
