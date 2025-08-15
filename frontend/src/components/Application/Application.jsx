@@ -15,13 +15,13 @@ const Application = () => {
 
   const { isAuthorized, user } = useContext(Context);
   const navigateTo = useNavigate();
-  //const { id } = useParams();
+  const { id } = useParams();
 
   const handleFileChange = (event) => {
     const resume = event.target.files[0];
     setResume(resume);
   };
-  const { id } = useParams();
+
   const handleApplication = async (e) => {
     e.preventDefault();
     if (!name || !email || !coverLetter || !phone || !address || !id) {

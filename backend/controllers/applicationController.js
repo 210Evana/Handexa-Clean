@@ -3,7 +3,7 @@ import ErrorHandler from "../middlewares/error.js";
 import { Application } from "../models/applicationSchema.js";
 import { Job } from "../models/jobSchema.js";
 import cloudinary from "cloudinary";
-//import mongoose from "mongoose";
+import mongoose from "mongoose";
 
 // Job Seeker applies for a job
 export const postApplication = catchAsyncErrors(async (req, res, next) => {
@@ -59,7 +59,7 @@ export const postApplication = catchAsyncErrors(async (req, res, next) => {
         user: jobDetails.postedBy,
         role: "Employer",
       },
-      //jobId, //add jobId
+      jobId, //add jobId
     });
 
     res.status(200).json({
@@ -67,14 +67,14 @@ export const postApplication = catchAsyncErrors(async (req, res, next) => {
       message: "Application Submitted!",
       application,
     });
-   /*} catch (error) {
+   } catch (error) {
     console.error("Error in postApplication:", error.stack);
     if (error.name === "ValidationError") {
       const messages = Object.values(error.errors).map((err) => err.message);
       return next(new ErrorHandler(`Validation failed: ${messages.join(", ")}`, 400));
     }
     return next(new ErrorHandler(`Failed to submit application: ${error.message}`, 500));
-  }*/
+  }
 });
 
 // Job Seeker views their applications
@@ -133,85 +133,107 @@ export const employerGetAllApplications = catchAsyncErrors(async (req, res, next
 
 // Job Seeker deletes an application
 export const jobseekerDeleteApplication = catchAsyncErrors(async (req, res, next) => {
-  const { role } = req.user;
-  if (role === "Employer") {
-    return next(new ErrorHandler("Employer not allowed to access this resource.", 400));
+  try {
+    const { role } = req.user;
+    if (role === "Employer") {
+      return next(new ErrorHandler("Employer not allowed to access this resource.", 400));
+    }
+    //const { _id } = req.user;
+    const application = await Application.findById(req.params.id);
+    if (!application) {
+      return next(new ErrorHandler("Application not found!", 404));
+    }
+    if (application.applicantID.user.toString() !== req.user._id.toString()) {
+      return next(new ErrorHandler("Not authorized to delete this application", 403));
+    }
+    await application.deleteOne();
+    res.status(200).json({
+      success: true,
+      message: "Application Deleted!",
+    });
+  } catch (error) {
+    console.error("Error in jobseekerDeleteApplication:", error.stack);
+    return next(new ErrorHandler(`Failed to delete application: ${error.message}`, 500));
   }
- const { _id } = req.user;
-  const application = await Application.findById(req.params.id);
-  if (!application) {
-    return next(new ErrorHandler("Application not found!", 404));
-  }
-  await application.deleteOne();
-  res.status(200).json({
-    success: true,
-    message: "Application Deleted!",
-  });
 });
 
 // Employer updates application status
 export const updateApplicationStatus = catchAsyncErrors(async (req, res, next) => {
-  if (req.user.role !== "Employer") {
-    return next(new ErrorHandler("Job Seeker not allowed to update status", 403));
-  }
+  try {
+    const { role } = req.user;
+    if (role !== "Employer") {
+      return next(new ErrorHandler("Job Seeker not allowed to update status", 403));
+    }
 
-  const { id } = req.params; // Changed from applicationId to id for consistency
-  const { status } = req.body;
-  if (!["pending", "accepted", "rejected"].includes(status)) {
-    return next(new ErrorHandler("Invalid status value", 400));
-  }
+    const { applicationId } = req.params;
+    console.log("Received applicationId:", applicationId); // Debug log
+    console.log("Employer ID:", req.user._id);
 
-  const application = await Application.findById(id);
-  if (!application) {
-    return next(new ErrorHandler("Application not found", 404));
-  }
+     if (!applicationId) {
+      return next(new ErrorHandler("Application ID is undefined", 400));
+    }
+     if (!mongoose.Types.ObjectId.isValid(applicationId)) {
+      return next(new ErrorHandler("Invalid application ID format", 400));
+    }
+    
+    const { status } = req.body;
+    if (!["pending", "accepted", "rejected"].includes(status)) {
+      return next(new ErrorHandler("Invalid status value", 400));
+    }
 
-  // Restrict to the employer who owns this application
-  if (application.employerID.user.toString() !== req.user._id.toString()) {
-    return next(new ErrorHandler("Not authorized to update this application", 403));
-  }
+    const application = await Application.findById(applicationId);
+    if (!application) {
+      console.log("No application found for ID:", applicationId); // Debug log
+      return next(new ErrorHandler("Application not found", 404));
+    }
 
-  application.status = status;
-  await application.save();
+    if (application.employerID.user.toString() !== req.user._id.toString()) {
+      return next(new ErrorHandler("Not authorized to update this application", 403));
+    }
 
-  // Initiate payment for "accepted" status
-  if (status === "accepted") {
-    try {
-      // Placeholder for payment initiation
-      // TODO: Integrate with Stripe/PayPal API
-      console.log(`Payment initiation placeholder for application ${id}`);
-      // Example: Add payment intent logic here
-      // const paymentIntent = await stripe.paymentIntents.create({ amount: job.salary * 100, currency: "usd" });
-      // application.paymentIntentId = paymentIntent.id;
-      // await application.save();
+    application.status = status;
+    await application.save();
+
+    if (status === "accepted") {
+      console.log(`Payment initiation placeholder for application ${applicationId}`);
       res.status(200).json({
         success: true,
         message: "Application status updated and payment initiated (placeholder)",
         application,
       });
-    } catch (error) {
-      return next(new ErrorHandler("Failed to initiate payment: " + error.message, 500));
+    } else {
+      res.status(200).json({
+        success: true,
+        message: "Application status updated",
+        application,
+      });
     }
-  } else {
-    res.status(200).json({
-      success: true,
-      message: "Application status updated",
-      application,
-    });
+  } catch (error) {
+    console.error("Error in updateApplicationStatus:", error.stack);
+    return next(new ErrorHandler(`Failed to update application status: ${error.message}`, 500));
   }
 });
+
 // Get application by ID
 export const getApplicationById = catchAsyncErrors(async (req, res, next) => {
-  const { applicationId } = req.params;
-  
-  const application = await Application.findById(applicationId)
-    .populate("applicantID.user", "name email role") // Updated to match schema
-    .populate("employerID.user", "name email role")
-    .populate("job", "title status");
-  if (!application) return next(new ErrorHandler("Application not found", 404));
-  if( application.user._id.toString() !== req.user._id.toString() &&
-      application.job.user.toString() !== req.user._id.toString()) {
-    return next(new ErrorHandler("Not authorized to view this application", 403));
+  try {
+    const { applicationId } = req.params;
+    const application = await Application.findById(applicationId)
+      .populate({ path: "jobId", select: "title company location" })
+      .populate({ path: "applicantID.user", select: "name email role" })
+      .populate({ path: "employerID.user", select: "name email role" });
+    if (!application) {
+      return next(new ErrorHandler("Application not found", 404));
+    }
+    if (
+      application.applicantID.user._id.toString() !== req.user._id.toString() &&
+      application.employerID.user._id.toString() !== req.user._id.toString()
+    ) {
+      return next(new ErrorHandler("Not authorized to view this application", 403));
+    }
+    res.status(200).json({ success: true, application });
+  } catch (error) {
+    console.error("Error in getApplicationById:", error.stack);
+    return next(new ErrorHandler(`Failed to fetch application: ${error.message}`, 500));
   }
-  res.status(200).json({ success: true, application });
 });

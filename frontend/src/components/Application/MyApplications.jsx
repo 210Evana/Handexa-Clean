@@ -43,10 +43,6 @@ const MyApplications = () => {
   }
 
   const deleteApplication = async (id) => {
-    if (!id) {
-      toast.error("Invalid application ID for deletion");
-      return;
-    }
     try {
       const { data } = await axios.delete(
         `${import.meta.env.VITE_BACKEND_URL}/api/v1/application/delete/${id}`,
@@ -61,22 +57,35 @@ const MyApplications = () => {
   };
 
   const handleStatusChange = async (applicationId, newStatus) => {
+  console.log("handleStatusChange called with applicationId:", applicationId, "newStatus:", newStatus);
+  if (!applicationId) {
+    toast.error("Application ID is undefined. Please try again.");
+    return;
+  }
   try {
     const { data } = await axios.put(
-      `${import.meta.env.VITE_BACKEND_URL}/api/v1/application/status/${applicationId}`, // Ensure applicationId matches :id
+      `${import.meta.env.VITE_BACKEND_URL}/api/v1/application/status/${applicationId}`,
       { status: newStatus },
       { withCredentials: true }
     );
     toast.success(data.message);
-    setApplications(prev =>
-      prev.map(application => application._id === applicationId ? { ...application, status: newStatus } : application)
+    setApplications((prev) =>
+      prev.map((application) =>
+        application._id === applicationId
+          ? { ...application, status: newStatus }
+          : application
+      )
     );
-
     if (newStatus === "accepted") {
       toast.success("Payment initiated (pending confirmation)");
     }
   } catch (error) {
-    toast.error(error.response?.data?.message || "Failed to update status");
+    console.error("Status update error:", error);
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to update status. Please try again.";
+    toast.error(errorMessage);
   }
 };
 
