@@ -98,24 +98,22 @@ export const jobseekerGetAllApplications = catchAsyncErrors(async (req, res, nex
 
 // Employer views all applications
 export const employerGetAllApplications = catchAsyncErrors(async (req, res, next) => {
-  try {
-    const { role } = req.user;
-    if (role === "Job Seeker") {
-      return next(new ErrorHandler("Job Seeker not allowed to access this resource.", 400));
-    }
-    console.log("Fetching applications for employer:", req.user._id);
-    const applications = await Application.find({ "employerID.user": req.user._id })
-      .populate({ path: "jobId", select: "title company location" })
-      .populate({ path: "applicantID.user", select: "name email phone" })
-      .populate({ path: "employerID.user", select: "name email" });
-    console.log("Applications fetched:", applications.length);
-    res.status(200).json({ success: true, applications });
-  } catch (error) {
-    console.error("Error in employerGetAllApplications:", error.stack);
-    return next(new ErrorHandler(`Failed to fetch applications: ${error.message}`, 500));
+  const { role } = req.user;
+  if (role !== "Employer") {
+    return next(new ErrorHandler("Job Seeker not allowed to access this resource.", 400));
   }
+  const applications = await Application.find({
+    "employerID.user": req.user._id,
+  }).populate({
+    path: "jobId",
+    select: "title category county location",
+  }).populate("applicantID.user", "name email");
+  console.log("Fetched applications for employer:", applications); // Debug log
+  res.status(200).json({
+    success: true,
+    applications,
+  });
 });
-
 
 // Job Seeker deletes an application
 export const jobseekerDeleteApplication = catchAsyncErrors(async (req, res, next) => {
@@ -152,6 +150,9 @@ export const updateApplicationStatus = catchAsyncErrors(async (req, res, next) =
     }
 
     const { applicationId } = req.params;
+    console.log("Received applicationId:", applicationId); // Debug log
+    console.log("Employer ID:", req.user._id);
+    
     const { status } = req.body;
     if (!["pending", "accepted", "rejected"].includes(status)) {
       return next(new ErrorHandler("Invalid status value", 400));
@@ -159,6 +160,7 @@ export const updateApplicationStatus = catchAsyncErrors(async (req, res, next) =
 
     const application = await Application.findById(applicationId);
     if (!application) {
+      console.log("No application found for ID:", applicationId); // Debug log
       return next(new ErrorHandler("Application not found", 404));
     }
 
@@ -170,7 +172,7 @@ export const updateApplicationStatus = catchAsyncErrors(async (req, res, next) =
     await application.save();
 
     if (status === "accepted") {
-      console.log(`Payment initiation placeholder for application ${applicantId}`);
+      console.log(`Payment initiation placeholder for application ${applicationId}`);
       res.status(200).json({
         success: true,
         message: "Application status updated and payment initiated (placeholder)",
