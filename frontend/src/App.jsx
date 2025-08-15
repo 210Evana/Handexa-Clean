@@ -18,6 +18,8 @@ import NotFound from "./components/NotFound/NotFound";
 import MyJobs from "./components/Job/MyJobs";
 import MessagePage from "./components/Messages/MessagePage";
 import AdminDashboard from "./components/Admin/AdminDashboard";
+import Contact from "./components/Contact/Contact.jsx";
+import SearchResults from "./components/Job/SearchResults";
 
 
 const App = () => {
@@ -25,22 +27,21 @@ const App = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/getuser`,
-       {
-        withCredentials: true,
-       }
+  const response = await axios.get(
+    `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/getuser`,
+    { withCredentials: true }
   );
+  setUser(response.data.user);
+  setIsAuthorized(true);
+} catch (error) {
+  setIsAuthorized(false);
+  if (error.response?.status === 401) {
+    navigate("/login");
+  }
+}
 
-        setUser(response.data.user);
-        setIsAuthorized(true);
-      } catch (error) {
-        setIsAuthorized(false);//set to false on error
-        console.log("Authorization error:",error.response?.data?.message || error.message); 
-      }
-    };
     fetchUser();
-  }, [isAuthorized]);
+  }, []);
 
   return (
     <>
@@ -62,6 +63,9 @@ const App = () => {
           <Route path="*" element={<NotFound />} />
           <Route path="/message/:applicationId" element={<MessagePage />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/contact" element={<Contact />} /> 
+          <Route path="/job/search" element={<SearchResults />} />
+
           
         </Routes>
         
