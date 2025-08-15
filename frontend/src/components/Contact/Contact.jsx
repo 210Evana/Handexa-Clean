@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./ContactUs.css";
+import "./Contact.css";
 import axios from "axios";
 import toast from "react-hot-toast";
 
