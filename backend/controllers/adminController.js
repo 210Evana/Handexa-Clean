@@ -82,7 +82,7 @@ export const getAdminStats = catchAsyncErrors(async (req, res, next) => {
     role: { $regex: /^employer$/i },
   });
   const totalJobSeekers = await User.countDocuments({
-    role: { $regex: /^jobseeker$/i },
+    role: { $regex: /^job seeker$/i },
   });
   const totalJobs = await Job.countDocuments();
   const totalApplications = await Application.countDocuments();
