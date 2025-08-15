@@ -102,7 +102,7 @@ export const employerGetAllApplications = catchAsyncErrors(async (req, res, next
   if (role !== "Employer") {
     return next(new ErrorHandler("Job Seeker not allowed to access this resource.", 400));
   }
-  const { _id } = req.user;
+  //const { _id } = req.user;
   const applications = await Application.find({
     "employerID.user": req.user._id,
   }).populate({
@@ -123,7 +123,7 @@ export const jobseekerDeleteApplication = catchAsyncErrors(async (req, res, next
     if (role === "Employer") {
       return next(new ErrorHandler("Employer not allowed to access this resource.", 400));
     }
-    const { _id } = req.user;
+    //const { _id } = req.user;
     const application = await Application.findById(req.params.id);
     if (!application) {
       return next(new ErrorHandler("Application not found!", 404));
