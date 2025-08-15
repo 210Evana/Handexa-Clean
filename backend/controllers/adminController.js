@@ -24,7 +24,8 @@ export const updateJobStatus = catchAsyncErrors(async (req, res, next) => { cons
 export const adminGetAllApplications = catchAsyncErrors(async (req, res, next) => { 
     const applications = await Application.find() 
     .populate("applicantID.user", "name email role") 
-    .populate("employerID.user", "name email role") .populate("job", "title status");
+    .populate("employerID.user", "name email role") 
+    .populate("jobId", "title status");
 
 res.status(200).json({ success: true, application: applications }); });
 
