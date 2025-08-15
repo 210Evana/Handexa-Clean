@@ -98,22 +98,26 @@ export const jobseekerGetAllApplications = catchAsyncErrors(async (req, res, nex
 
 // Employer views all applications
 export const employerGetAllApplications = catchAsyncErrors(async (req, res, next) => {
-  const { role } = req.user;
-  if (role !== "Employer") {
-    return next(new ErrorHandler("Job Seeker not allowed to access this resource.", 400));
+  try {
+    const { role } = req.user;
+    if (role !== "Employer") {
+      return next(new ErrorHandler("Job Seeker not allowed to access this resource.", 400));
+    }
+    const applications = await Application.find({
+      "employerID.user": req.user._id,
+    }).populate({
+      path: "jobId",
+      select: "title category county location",
+    }).populate("applicantID.user", "name email");
+    console.log("Fetched applications for employer:", applications);
+    res.status(200).json({
+      success: true,
+      applications,
+    });
+  } catch (error) {
+    console.error("Error in employerGetAllApplications:", error.stack);
+    return next(new ErrorHandler(`Failed to fetch applications: ${error.message}`, 500));
   }
-  //const { _id } = req.user;
-  const applications = await Application.find({
-    "employerID.user": req.user._id,
-  }).populate({
-    path: "jobId",
-    select: "title category county location",
-  }).populate("applicantID.user", "name email");
-  console.log("Fetched applications for employer:", applications); // Debug log
-  res.status(200).json({
-    success: true,
-    applications,
-  });
 });
 
 // Job Seeker deletes an application
@@ -150,9 +154,16 @@ export const updateApplicationStatus = catchAsyncErrors(async (req, res, next) =
       return next(new ErrorHandler("Job Seeker not allowed to update status", 403));
     }
 
-    const { id } = req.params;
+    const { applicationId } = req.params;
     console.log("Received applicationId:", applicationId); // Debug log
     console.log("Employer ID:", req.user._id);
+
+     if (!applicationId) {
+      return next(new ErrorHandler("Application ID is undefined", 400));
+    }
+     if (!mongoose.Types.ObjectId.isValid(applicationId)) {
+      return next(new ErrorHandler("Invalid application ID format", 400));
+    }
     
     const { status } = req.body;
     if (!["pending", "accepted", "rejected"].includes(status)) {

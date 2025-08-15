@@ -57,6 +57,11 @@ const MyApplications = () => {
   };
 
   const handleStatusChange = async (applicationId, newStatus) => {
+  console.log("handleStatusChange called with applicationId:", applicationId, "newStatus:", newStatus);
+  if (!applicationId) {
+    toast.error("Application ID is undefined. Please try again.");
+    return;
+  }
   try {
     const { data } = await axios.put(
       `${import.meta.env.VITE_BACKEND_URL}/api/v1/application/status/${applicationId}`,
