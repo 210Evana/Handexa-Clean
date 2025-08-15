@@ -1,217 +1,359 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import "./AdminDashboard.css";
 
+const TABS = ["users", "jobs", "applications"];
+
+const StatCard = ({ label, value, hint }) => (
+  <div className="stat-card">
+    <div className="stat-label">{label}</div>
+    <div className="stat-value">{value ?? 0}</div>
+    {hint ? <div className="stat-hint">{hint}</div> : null}
+  </div>
+);
+
+const Pill = ({ text, tone = "neutral" }) => (
+  <span className={`pill pill-${tone}`}>{text}</span>
+);
+
 const AdminDashboard = () => {
   const [view, setView] = useState("users");
+  const [loading, setLoading] = useState(false);
+
+  const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [applications, setApplications] = useState([]);
-  const [stats, setStats] = useState(null);
 
-  // Fetch stats once on mount
+  const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("all");
+
+  // -------- Load Stats (once) ----------
   useEffect(() => {
     axios
       .get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/stats`, {
         withCredentials: true,
       })
-      .then((res) => setStats(res.data.stats))
-      .catch(() => toast.error("Failed to load stats"));
+      .then((res) => setStats(res.data?.stats || null))
+      .catch((err) => {
+        console.error(err);
+        toast.error("Failed to load stats");
+      });
   }, []);
 
-  // Fetch data based on selected view
+  // -------- Load Table Data (on tab change) ----------
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
+
         if (view === "users") {
           const res = await axios.get(
             `${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/users`,
             { withCredentials: true }
           );
-          setUsers(res.data.users);
-        } else if (view === "jobs") {
+          setUsers(res.data?.users || []);
+        }
+
+        if (view === "jobs") {
           const res = await axios.get(
             `${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/jobs`,
             { withCredentials: true }
           );
-          setJobs(res.data.jobs);
-        } else if (view === "applications") {
+          setJobs(res.data?.jobs || []);
+        }
+
+        if (view === "applications") {
           const res = await axios.get(
             `${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/applications`,
             { withCredentials: true }
           );
-          setApplications(res.data.application); // matches backend key
+          // backend returns { application: [...] }
+          setApplications(res.data?.application || []);
         }
       } catch (err) {
+        console.error(err);
         toast.error(err.response?.data?.message || "Error loading data");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchData();
   }, [view]);
 
-  // Update user status
+  // -------- Actions ----------
   const handleUserStatus = async (userId, status) => {
     try {
       const res = await axios.put(
         `${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/users/${userId}/status`,
-        { status },
+        { status }, // "approved" | "blocked"
         { withCredentials: true }
       );
+      toast.success(res.data?.message || "Status updated");
 
-      toast.success(res.data.message);
-
-      // Refresh users after update
+      // refresh users list
       const updated = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/users`,
         { withCredentials: true }
       );
-      setUsers(updated.data.users);
+      setUsers(updated.data?.users || []);
     } catch (err) {
+      console.error(err);
       toast.error(err.response?.data?.message || "Update failed");
     }
   };
 
+  // -------- Client-side filtering for Users tab ----------
+  const filteredUsers = useMemo(() => {
+    let list = [...users];
+
+    if (roleFilter !== "all") {
+      list = list.filter(
+        (u) => (u.role || "").toLowerCase() === roleFilter.toLowerCase()
+      );
+    }
+
+    if (search.trim()) {
+      const term = search.toLowerCase();
+      list = list.filter(
+        (u) =>
+          u.name?.toLowerCase().includes(term) ||
+          u.email?.toLowerCase().includes(term) ||
+          u.role?.toLowerCase().includes(term)
+      );
+    }
+    return list;
+  }, [users, roleFilter, search]);
+
   return (
-    <div className="admin-container">
+    <div className="admin__wrap">
       {/* Sidebar */}
-      <aside className="sidebar">
-        <h2>Admin</h2>
-        <h2>Dashboard</h2>
-        <button
-          className={view === "users" ? "active" : ""}
-          onClick={() => setView("users")}
-        >
-          Users
-        </button>
-        <button
-          className={view === "jobs" ? "active" : ""}
-          onClick={() => setView("jobs")}
-        >
-          Jobs
-        </button>
-        <button
-          className={view === "applications" ? "active" : ""}
-          onClick={() => setView("applications")}
-        >
-          Applications
-        </button>
+      <aside className="admin__sidebar">
+        <div className="sidebar__title">Admin</div>
+        <div className="sidebar__subtitle">Dashboard</div>
+
+        <div className="sidebar__tabs">
+          {TABS.map((t) => (
+            <button
+              key={t}
+              className={`sidebar__tab ${view === t ? "active" : ""}`}
+              onClick={() => setView(t)}
+            >
+              {t.charAt(0).toUpperCase() + t.slice(1)}
+            </button>
+          ))}
+        </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="content">
-        <h2>
-          {view === "users"
-            ? "All Users"
-            : view === "jobs"
-            ? "All Jobs"
-            : "All Applications"}
-        </h2>
-
+      {/* Main */}
+      <main className="admin__main">
         {/* Stats */}
-        {stats && (
-          <div className="stats-bar">
-            <p>Total Users: {stats.totalUsers}</p>
-            <p>Employers: {stats.totalEmployers}</p>
-            <p>Job Seekers: {stats.totalJobSeekers}</p>
-            <p>Jobs Posted: {stats.totalJobs}</p>
-            <p>Applications Made: {stats.totalApplications}</p>
-          </div>
-        )}
+        <section className="stats__grid">
+          <StatCard
+            label="Total Users"
+            value={stats?.totalUsers}
+            hint="All registered users"
+          />
+          <StatCard
+            label="Employers"
+            value={stats?.totalEmployers}
+            hint="Company accounts"
+          />
+          <StatCard
+            label="Job Seekers"
+            value={stats?.totalJobSeekers}
+            hint="Candidate accounts"
+          />
+          <StatCard
+            label="Jobs Posted"
+            value={stats?.totalJobs}
+            hint="Openings created"
+          />
+          <StatCard
+            label="Applications"
+            value={stats?.totalApplications}
+            hint="Submissions made"
+          />
+        </section>
 
-        {/* Users Table */}
-        {view === "users" && (
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Role</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user._id}>
-                  <td>{user.name}</td>
-                  <td>{user.email}</td>
-                  <td>{user.phone}</td>
-                  <td>{user.role}</td>
-                  <td>
-                    <button
-                      className="approve"
-                      onClick={() => handleUserStatus(user._id, "approved")}
-                      disabled={user.status === "approved"}
-                    >
-                      Approve
-                    </button>
-                    <button
-                      className="block"
-                      onClick={() => handleUserStatus(user._id, "blocked")}
-                      disabled={user.status === "blocked"}
-                    >
-                      Block
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+        {/* Header + Tools */}
+        <div className="table__header">
+          <h2 className="table__title">
+            {view === "users" ? "Users" : view === "jobs" ? "Jobs" : "Applications"}
+          </h2>
 
-        {/* Jobs Table */}
-        {view === "jobs" && (
-          <table>
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Category</th>
-                <th>Posted By</th>
-              </tr>
-            </thead>
-            <tbody>
-              {jobs.map((job) => (
-                <tr key={job._id}>
-                  <td>{job.title}</td>
-                  <td>{job.category}</td>
-                  <td>{job.postedBy?.name || job.postedBy?.email}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+          {view === "users" && (
+            <div className="table__tools">
+              <input
+                className="input"
+                placeholder="Search name, email, role..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <select
+                className="select"
+                value={roleFilter}
+                onChange={(e) => setRoleFilter(e.target.value)}
+              >
+                <option value="all">All roles</option>
+                <option value="Employer">Employers</option>
+                <option value="Job Seeker">Job Seekers</option>
+              </select>
+            </div>
+          )}
+        </div>
 
-        {/* Applications Table */}
-        {view === "applications" && (
-          <table>
-            <thead>
-              <tr>
-                <th>Applicant</th>
-                <th>Employer</th>
-                <th>Status</th>
-                <th>Payment</th>
-              </tr>
-            </thead>
-            <tbody>
-              {applications.length > 0 ? (
-                applications.map((app) => (
-                  <tr key={app._id}>
-                    <td>{app.applicantID?.user?.name}</td>
-                    <td>{app.employerID?.user?.name}</td>
-                    <td>{app.status || "pending"}</td>
-                    <td>{app.paymentStatus || "unpaid"}</td>
-                  </tr>
-                ))
-              ) : (
+        {/* Tables */}
+        <div className="table__card">
+          {loading ? (
+            <div className="loading">Loading…</div>
+          ) : view === "users" ? (
+            <table className="table">
+              <thead>
                 <tr>
-                  <td colSpan="4">No applications found</td>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th style={{ width: 220 }}>Actions</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        )}
+              </thead>
+              <tbody>
+                {filteredUsers.length ? (
+                  filteredUsers.map((u) => (
+                    <tr key={u._id}>
+                      <td>{u.name}</td>
+                      <td>{u.email}</td>
+                      <td>{u.phone || "-"}</td>
+                      <td>
+                        <Pill
+                          text={u.role}
+                          tone={
+                            u.role === "Employer"
+                              ? "info"
+                              : u.role === "Job Seeker"
+                              ? "success"
+                              : "neutral"
+                          }
+                        />
+                      </td>
+                      <td>
+                        <Pill
+                          text={u.status || "pending"}
+                          tone={
+                            u.status === "approved"
+                              ? "success"
+                              : u.status === "blocked"
+                              ? "danger"
+                              : "warn"
+                          }
+                        />
+                      </td>
+                      <td>
+                        <div className="actions">
+                          <button
+                            className="btn btn-approve"
+                            onClick={() => handleUserStatus(u._id, "approved")}
+                            disabled={u.status === "approved"}
+                          >
+                            Approve
+                          </button>
+                          <button
+                            className="btn btn-block"
+                            onClick={() => handleUserStatus(u._id, "blocked")}
+                            disabled={u.status === "blocked"}
+                          >
+                            Block
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" className="empty">
+                      No users found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          ) : view === "jobs" ? (
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th>Location</th>
+                  <th>Posted By</th>
+                </tr>
+              </thead>
+              <tbody>
+                {jobs.length ? (
+                  jobs.map((j) => (
+                    <tr key={j._id}>
+                      <td>{j.title}</td>
+                      <td>{j.category || "-"}</td>
+                      <td>{j.location || "-"}</td>
+                      <td>{j.postedBy?.name || j.postedBy?.email || "-"}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4" className="empty">
+                      No jobs found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          ) : (
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Job</th>
+                  <th>Applicant</th>
+                  <th>Employer</th>
+                  <th>Status</th>
+                  <th>Payment</th>
+                </tr>
+              </thead>
+              <tbody>
+                {applications.length ? (
+                  applications.map((a) => (
+                    <tr key={a._id}>
+                      <td>{a.jobId?.title || "-"}</td>
+                      <td>{a.applicantID?.user?.name || "-"}</td>
+                      <td>{a.employerID?.user?.name || "-"}</td>
+                      <td>
+                        <Pill
+                          text={a.status || "pending"}
+                          tone={
+                            a.status === "accepted"
+                              ? "success"
+                              : a.status === "rejected"
+                              ? "danger"
+                              : "warn"
+                          }
+                        />
+                      </td>
+                      <td>{a.payment || "Unpaid"}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="empty">
+                      No applications found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          )}
+        </div>
       </main>
     </div>
   );
