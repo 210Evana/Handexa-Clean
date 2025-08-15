@@ -31,17 +31,19 @@ const App = () => {
     const fetchUser = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/getuser`,
-           { withCredentials: true } ); 
-setUser(response.data.user); 
-setIsAuthorized(true); 
-} catch (error) {
- setIsAuthorized(false); 
-if (error.response?.status === 401)
- { navigate("/login"); 
-} } 
-fetchUser(); 
-}, []); 
+           `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/getuser`,
+          {
+            withCredentials: true,
+          }
+        );
+        setUser(response.data.user);
+        setIsAuthorized(true);
+      } catch (error) {
+        setIsAuthorized(false);
+      }
+    };
+    fetchUser();
+  }, [isAuthorized]);
 
   return (
     <>
