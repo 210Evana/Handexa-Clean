@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from "react";
 import "./App.css";
 import { Context } from "./main";
-import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom"; // ✅ added useNavigate
 import Login from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
 import { Toaster } from "react-hot-toast";
@@ -22,8 +22,8 @@ import Contact from "./components/Contact/Contact.jsx";
 import SearchResults from "./components/Job/SearchResults";
 
 const App = () => {
-  const { setIsAuthorized, setUser } = useContext(Context);
-  const navigate = useNavigate(); // ✅ Added this
+  const { isAuthorized, setIsAuthorized, setUser } = useContext(Context);
+  const navigate = useNavigate(); // ✅ added navigate
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -37,35 +37,38 @@ const App = () => {
       } catch (error) {
         setIsAuthorized(false);
         if (error.response?.status === 401) {
-          navigate("/login"); // ✅ Now works
+          navigate("/login");
         }
       }
     };
 
     fetchUser();
-  }, [navigate, setIsAuthorized, setUser]); // ✅ Added dependencies
+  }, []);
 
   return (
     <>
-      <Navbar />
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/" element={<Home />} />
-        <Route path="/job/getall" element={<Jobs />} />
-        <Route path="/job/:id" element={<JobDetails />} />
-        <Route path="/application/:id" element={<Application />} />
-        <Route path="/applications/me" element={<MyApplications />} />
-        <Route path="/job/post" element={<PostJob />} />
-        <Route path="/job/me" element={<MyJobs />} />
-        <Route path="*" element={<NotFound />} />
-        <Route path="/message/:applicationId" element={<MessagePage />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/job/search" element={<SearchResults />} />
-      </Routes>
-      <Footer />
-      <Toaster />
+      <BrowserRouter>
+        <Navbar />
+        {/* Main content will be rendered here */}
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/job/getall" element={<Jobs />} />
+          <Route path="/job/:id" element={<JobDetails />} />
+          <Route path="/application/:id" element={<Application />} />
+          <Route path="/applications/me" element={<MyApplications />} />
+          <Route path="/job/post" element={<PostJob />} />
+          <Route path="/job/me" element={<MyJobs />} />
+          <Route path="*" element={<NotFound />} />
+          <Route path="/message/:applicationId" element={<MessagePage />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/job/search" element={<SearchResults />} />
+        </Routes>
+        <Footer />
+        <Toaster />
+      </BrowserRouter>
     </>
   );
 };
