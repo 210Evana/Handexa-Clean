@@ -106,11 +106,21 @@ export const employerGetAllApplications = catchAsyncErrors(async (req, res, next
     }
     const applications = await Application.find({
       "employerID.user": req.user._id,
-    }).populate({
-      path: "jobId",
-      select: "title category county location",
-    }).populate("applicantID.user", "name email");
-    console.log("Applications with IDs:", applications.map(app => ({ _id: app._id, jobId: app.jobId })));
+    })
+      .populate({
+        path: "jobId",
+        select: "title category county location",
+      })
+      .populate("applicantID.user", "name email");
+    console.log(
+      "Applications with IDs:",
+      applications.map((app) => ({
+        _id: app._id,
+        jobId: app.jobId,
+        applicantID: app.applicantID,
+        employerID: app.employerID,
+      }))
+    );
     res.status(200).json({
       success: true,
       applications,
