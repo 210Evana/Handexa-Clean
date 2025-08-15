@@ -24,12 +24,8 @@ const Register = () => {
       const { data } = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/register`,
         { name, phone, email, role, password },
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        }
+        { headers: { "Content-Type": "application/json" }, withCredentials: true }
       );
-
       toast.success(data.message);
       setUser(data.user);
       setName("");
@@ -54,116 +50,114 @@ const Register = () => {
   }
 
   return (
-    <section className="authPage">
-      <div className="container">
-        <div className="header">
-          <div
-  className="logo-bg rounded-circle d-flex align-items-center justify-content-center me-3 overflow-hidden"
-  style={{ width: "110px", height: "60px" }}
->
-  <span className="logo-text text-white fs-5 moving-welcome">
-    Welcome
-  </span>
-</div>
-<h1 className="logo-text m-0">
-  <span className="logo-hand">Hand</span>
-  <span className="logo-exa">Exa</span>
-</h1>
-          <h3>Create a new account</h3>
+    <>
+      <section className="authPage auth-register">
+        <div className="container">
+          <div className="header">
+            <div className="logo-marquee" aria-hidden="true">
+              <span className="moving-welcome">WELCOME • WELCOME • WELCOME • </span>
+            </div>
+
+            <h1 className="logo-text m-0" aria-label="HandExa">
+              <span className="logo-hand">Hand</span>
+              <span className="logo-exa">Exa</span>
+            </h1>
+
+            <h3>Create a new account</h3>
+          </div>
+
+          <form onSubmit={handleRegister}>
+            <div className="inputTag">
+              <label>Register As</label>
+              <div>
+                <select value={role} onChange={(e) => setRole(e.target.value)} required>
+                  <option value="">Select Role</option>
+                  <option value="Employer">Employer</option>
+                  <option value="Job Seeker">Job Seeker</option>
+                </select>
+                <FaRegUser />
+              </div>
+            </div>
+
+            <div className="inputTag">
+              <label>Name</label>
+              <div>
+                <input
+                  type="text"
+                  placeholder="Tavian"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+                <FaPencilAlt />
+              </div>
+            </div>
+
+            <div className="inputTag">
+              <label>Email Address</label>
+              <div>
+                <input
+                  type="email"
+                  placeholder="evanajuma2003@gmail.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <MdOutlineMailOutline />
+              </div>
+            </div>
+
+            <div className="inputTag">
+              <label>Phone Number</label>
+              <div>
+                <input
+                  type="tel"
+                  placeholder="0712345678"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  required
+                />
+                <FaPhoneFlip />
+              </div>
+            </div>
+
+            <div className="inputTag">
+              <label>Password</label>
+              <div>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Your Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+
+                {showPassword ? (
+                  <FaEyeSlash
+                    className="password-toggle"
+                    title="Hide password"
+                    onClick={() => setShowPassword(false)}
+                  />
+                ) : (
+                  <FaEye
+                    className="password-toggle"
+                    title="Show password"
+                    onClick={() => setShowPassword(true)}
+                  />
+                )}
+              </div>
+            </div>
+
+            <button type="submit">Register</button>
+            <Link to="/login">Login Now</Link>
+          </form>
         </div>
 
-        <form onSubmit={handleRegister}>
-          <div className="inputTag">
-            <label>Register As</label>
-            <div>
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                required
-              >
-                <option value="">Select Role</option>
-                <option value="Employer">Employer</option>
-                <option value="Job Seeker">Job Seeker</option>
-              </select>
-              <FaRegUser />
-            </div>
-          </div>
-
-          <div className="inputTag">
-            <label>Name</label>
-            <div>
-              <input
-                type="text"
-                placeholder="Tavian"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-              <FaPencilAlt />
-            </div>
-          </div>
-
-          <div className="inputTag">
-            <label>Email Address</label>
-            <div>
-              <input
-                type="email"
-                placeholder="evanajuma2003@gmail.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-              <MdOutlineMailOutline />
-            </div>
-          </div>
-
-          <div className="inputTag">
-            <label>Phone Number</label>
-            <div>
-              <input
-                type="tel"
-                placeholder="0712345678"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-              />
-              <FaPhoneFlip />
-            </div>
-          </div>
-
-          <div className="inputTag">
-            <label>Password</label>
-            <div style={{ position: "relative" }}>
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Your Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              {showPassword ? (
-                <FaEye
-                  onClick={() => setShowPassword(false)}
-                  className="password-toggle"
-                />
-              ) : (
-                <FaEyeSlash
-                  onClick={() => setShowPassword(true)}
-                  className="password-toggle"
-                />
-              )}
-            </div>
-          </div>
-
-          <button type="submit">Register</button>
-          <Link to={"/login"}>Login Now</Link>
-        </form>
-      </div>
-
-      <div className="banner">
-        <img src="/login.avif" alt="login" />
-      </div>
-    </section>
+        <div className="banner">
+          <img src="/login.avif" alt="login" />
+        </div>
+      </section>
+    </>
   );
 };
 
