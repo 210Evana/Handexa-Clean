@@ -15,27 +15,26 @@ const MyApplications = () => {
   const navigateTo = useNavigate();
 
   useEffect(() => {
-  const fetchApplications = async () => {
-    setLoading(true);
-    try {
-      const endpoint =
-        user?.role === "Employer"
-          ? `${import.meta.env.VITE_BACKEND_URL}/api/v1/application/employer/getall`
-          : `${import.meta.env.VITE_BACKEND_URL}/api/v1/application/jobseeker/getall`;
-      const { data } = await axios.get(endpoint, { withCredentials: true });
-      console.log("Fetched applications:", data.applications); // Debug log
-      setApplications(data.applications || []);
-    } catch (error) {
-      console.error("Fetch applications error:", error);
-      toast.error(error.response?.data?.message || "Failed to fetch applications");
-    } finally {
-      setLoading(false);
+    const fetchApplications = async () => {
+      setLoading(true);
+      try {
+        const endpoint =
+          user?.role === "Employer"
+            ? `${import.meta.env.VITE_BACKEND_URL}/api/v1/application/employer/getall`
+            : `${import.meta.env.VITE_BACKEND_URL}/api/v1/application/jobseeker/getall`;
+        const { data } = await axios.get(endpoint, { withCredentials: true });
+        setApplications(data.applications || []);
+      } catch (error) {
+        toast.error(error.response?.data?.message || "Failed to fetch applications");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (isAuthorized && user) {
+      fetchApplications();
     }
-  };
-  if (isAuthorized && user) {
-    fetchApplications();
-  }
-}, [isAuthorized, user]);
+  }, [isAuthorized, user]);
 
   if (!isAuthorized) {
     navigateTo("/");
@@ -44,7 +43,6 @@ const MyApplications = () => {
 
   const deleteApplication = async (id) => {
     if (!id) {
-      console.error("Delete application called with undefined ID");
       toast.error("Invalid application ID for deletion");
       return;
     }
@@ -54,46 +52,34 @@ const MyApplications = () => {
         { withCredentials: true }
       );
       toast.success(data.message);
-      setApplications((prev) => prev.filter((application) => application._id !== id));
+      setApplications((prev) => prev.filter((app) => app._id !== id));
     } catch (error) {
-      console.error("Delete application error:", error);
       toast.error(error.response?.data?.message || "Failed to delete application");
     }
   };
 
   const handleStatusChange = async (applicationId, newStatus) => {
-    console.log("handleStatusChange called with applicationId:", applicationId, "newStatus:", newStatus);
-    if (!applicationId) {
-      console.error("Application ID is undefined in handleStatusChange");
-      toast.error("Application ID is undefined. Please try again.");
-      return;
-    }
+    const oldApplications = [...applications]; // backup for rollback
+    setApplications((prev) =>
+      prev.map((app) =>
+        app._id === applicationId ? { ...app, status: newStatus } : app
+      )
+    );
+
     try {
       const url = `${import.meta.env.VITE_BACKEND_URL}/api/v1/application/status/${applicationId}`;
-      console.log("Sending PUT request to:", url);
       const { data } = await axios.put(
         url,
         { status: newStatus },
         { withCredentials: true }
       );
       toast.success(data.message);
-      setApplications((prev) =>
-        prev.map((application) =>
-          application._id === applicationId
-            ? { ...application, status: newStatus }
-            : application
-        )
-      );
-      if (newStatus === "accepted") {
+      if (data.paymentInitiated) {
         toast.success("Payment initiated (pending confirmation)");
       }
     } catch (error) {
-      console.error("Status update error:", error);
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "Failed to update status. Please try again.";
-      toast.error(errorMessage);
+      setApplications(oldApplications); // revert changes
+      toast.error(error.response?.data?.message || "Failed to update status");
     }
   };
 
@@ -102,8 +88,12 @@ const MyApplications = () => {
     setModalOpen(true);
   };
 
-  const closeModal = () => {
-    setModalOpen(false);
+  const closeModal = () => setModalOpen(false);
+
+  const getStatusColor = (status) => {
+    if (status === "accepted") return "green";
+    if (status === "rejected") return "red";
+    return "orange";
   };
 
   return (
@@ -123,19 +113,18 @@ const MyApplications = () => {
                 deleteApplication={deleteApplication}
                 openModal={openModal}
                 navigateTo={navigateTo}
+                getStatusColor={getStatusColor}
               />
             ) : (
-              element._id ? (
+              element._id && (
                 <EmployerCard
                   element={element}
                   key={element._id}
                   openModal={openModal}
                   handleStatusChange={handleStatusChange}
                   navigateTo={navigateTo}
+                  getStatusColor={getStatusColor}
                 />
-              ) : (
-                console.warn("Skipping application due to missing _id:", JSON.stringify(element, null, 2)),
-                null
               )
             )
           )
@@ -146,107 +135,89 @@ const MyApplications = () => {
   );
 };
 
-const JobSeekerCard = ({ element, deleteApplication, openModal, navigateTo }) => {
-  return (
-    <div className="job_seeker_card">
-      <div className="detail">
-        <p><span>Job Title:</span> {element.jobId?.title || "Unknown Job"}</p>
-        <p><span>Location:</span> {element.jobId?.location || "Unknown Location"}</p>
-        <p><span>Name:</span> {element.name || "N/A"}</p>
-        <p><span>Email:</span> {element.email || "N/A"}</p>
-        <p><span>Phone:</span> {element.phone || "N/A"}</p>
-        <p><span>Address:</span> {element.address || "N/A"}</p>
-        <p><span>Cover Letter:</span> {element.coverLetter || "None"}</p>
-        <p>
-          <span>Status:</span>
-          <strong
-            style={{
-              color:
-                element.status === "accepted" ? "green" : element.status === "rejected" ? "red" : "orange",
-            }}
-          >
-            {element.status || "Pending"}
-          </strong>
-        </p>
-      </div>
-      <div className="resume">
-        {element.resume?.url ? (
-          <img
-            src={element.resume.url}
-            alt="resume"
-            onClick={() => openModal(element.resume.url)}
-            style={{ cursor: "pointer" }}
-          />
-        ) : (
-          <p>No resume available</p>
-        )}
-      </div>
-      <div className="btn_area">
-        <button onClick={() => deleteApplication(element._id)}>Delete Application</button>
-        <button onClick={() => navigateTo(`/message/${element._id}`)}>Message</button>
-      </div>
+const JobSeekerCard = ({ element, deleteApplication, openModal, navigateTo, getStatusColor }) => (
+  <div className="job_seeker_card">
+    <div className="detail">
+      <p><span>Job Title:</span> {element.jobId?.title || "Unknown Job"}</p>
+      <p><span>Location:</span> {element.jobId?.location || "Unknown Location"}</p>
+      <p><span>Name:</span> {element.name || "N/A"}</p>
+      <p><span>Email:</span> {element.email || "N/A"}</p>
+      <p><span>Phone:</span> {element.phone || "N/A"}</p>
+      <p><span>Address:</span> {element.address || "N/A"}</p>
+      <p><span>Cover Letter:</span> {element.coverLetter || "None"}</p>
+      <p>
+        <span>Status:</span>
+        <strong style={{ color: getStatusColor(element.status) }}>
+          {element.status || "Pending"}
+        </strong>
+      </p>
     </div>
-  );
-};
+    <div className="resume">
+      {element.resume?.url ? (
+        <img
+          src={element.resume.url}
+          alt="resume"
+          onClick={() => openModal(element.resume.url)}
+          style={{ cursor: "pointer" }}
+        />
+      ) : (
+        <p>No resume available</p>
+      )}
+    </div>
+    <div className="btn_area">
+      <button onClick={() => deleteApplication(element._id)}>Delete Application</button>
+      <button onClick={() => navigateTo(`/message/${element._id}`)}>Message</button>
+    </div>
+  </div>
+);
 
-const EmployerCard = ({ element, openModal, handleStatusChange, navigateTo }) => {
-if (!element._id) {
-    console.warn("Missing _id for application:", JSON.stringify(element, null, 2));
-    return null;
-  }
-  return (
-    <div className="job_seeker_card">
-      <div className="detail">
-        <p><span>Job Title:</span> {element.jobId?.title || "Unknown Job"}</p>
-        <p><span>Location:</span> {element.jobId?.location || "Unknown Location"}</p>
-        <p><span>Name:</span> {element.name || "N/A"}</p>
-        <p><span>Email:</span> {element.email || "N/A"}</p>
-        <p><span>Phone:</span> {element.phone || "N/A"}</p>
-        <p><span>Address:</span> {element.address || "N/A"}</p>
-        <p><span>Cover Letter:</span> {element.coverLetter || "None"}</p>
-        <p>
-          <span>Status:</span>
-          <strong
-            style={{
-              color:
-                element.status === "accepted" ? "green" : element.status === "rejected" ? "red" : "orange",
-            }}
-          >
-            {element.status || "Pending"}
-          </strong>
-        </p>
-        <select
-          value={element.status || "pending"}
-          onChange={(e) => handleStatusChange(element._id, e.target.value)}
-          style={{ background: "#e6f7fc", borderRadius: "6px", padding: "8px" }}
-        >
-          <option value="pending">Pending</option>
-          <option value="accepted">Accepted</option>
-          <option value="rejected">Rejected</option>
-        </select>
-      </div>
-      <div className="resume">
-        {element.resume?.url ? (
-          <img
-            src={element.resume.url}
-            alt="resume"
-            onClick={() => openModal(element.resume.url)}
-            style={{ cursor: "pointer" }}
-          />
-        ) : (
-          <p>No resume available</p>
-        )}
-      </div>
-      <div className="btn_area">
-        <button
-          onClick={() => navigateTo(`/message/${element._id}`)}
-          style={{ background: "#e232bcff" }}
-        >
-          Message
-        </button>
-      </div>
+const EmployerCard = ({ element, openModal, handleStatusChange, navigateTo, getStatusColor }) => (
+  <div className="job_seeker_card">
+    <div className="detail">
+      <p><span>Job Title:</span> {element.jobId?.title || "Unknown Job"}</p>
+      <p><span>Location:</span> {element.jobId?.location || "Unknown Location"}</p>
+      <p><span>Name:</span> {element.name || "N/A"}</p>
+      <p><span>Email:</span> {element.email || "N/A"}</p>
+      <p><span>Phone:</span> {element.phone || "N/A"}</p>
+      <p><span>Address:</span> {element.address || "N/A"}</p>
+      <p><span>Cover Letter:</span> {element.coverLetter || "None"}</p>
+      <p>
+        <span>Status:</span>
+        <strong style={{ color: getStatusColor(element.status) }}>
+          {element.status || "Pending"}
+        </strong>
+      </p>
+      <select
+        value={element.status || "pending"}
+        onChange={(e) => handleStatusChange(element._id, e.target.value)}
+        style={{ background: "#e6f7fc", borderRadius: "6px", padding: "8px" }}
+      >
+        <option value="pending">Pending</option>
+        <option value="accepted">Accepted</option>
+        <option value="rejected">Rejected</option>
+      </select>
     </div>
-  );
-};
+    <div className="resume">
+      {element.resume?.url ? (
+        <img
+          src={element.resume.url}
+          alt="resume"
+          onClick={() => openModal(element.resume.url)}
+          style={{ cursor: "pointer" }}
+        />
+      ) : (
+        <p>No resume available</p>
+      )}
+    </div>
+    <div className="btn_area">
+      <button
+        onClick={() => navigateTo(`/message/${element._id}`)}
+        style={{ background: "#e232bcff" }}
+      >
+        Message
+      </button>
+    </div>
+  </div>
+);
 
 export default MyApplications;
