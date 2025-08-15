@@ -1,4 +1,4 @@
-/* Navbar general styles */
+/* Navbar Base */
 .navbarShow {
   background: linear-gradient(90deg, #aa1196, #ffcc70, #6a82fb);
   padding: 10px 20px;
@@ -66,10 +66,44 @@
 .nav-icon {
   font-size: 24px;
 }
+
 .nav-text {
   font-size: 12px;
   text-align: center;
   line-height: 1.2;
+}
+
+/* Search bar styling */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.15);
+  padding: 6px;
+  border-radius: 8px;
+}
+
+.search-bar select {
+  padding: 5px;
+  border-radius: 5px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+}
+
+.search-bar button {
+  background: #ffcc70;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  color: #333;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.search-bar button:hover {
+  background: #ffaa33;
 }
 
 /* Profile section */
@@ -132,19 +166,7 @@
   .hamburger {
     display: block;
   }
-}
-@media (min-width: 768px) {
-  .menu a {
-    flex-direction: row;
-    gap: 6px;
-  }
-
-  .nav-icon {
-    font-size: 18px;
-  }
-
-  .nav-text {
-    font-size: 14px;
-    text-align: left;
+  .search-bar {
+    flex-direction: column;
   }
 }

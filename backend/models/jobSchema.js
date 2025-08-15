@@ -47,20 +47,24 @@ const jobSchema = new mongoose.Schema({
      
     
   county: {
-    type: String,
-    required: [true, "Please provide a county name."],
-    enum: [
-      "Nairobi",
-      "Mombasa",
-      "Bungoms",
-      "Kisumu",
-      "Nakuru",
-      "Eldoret",
-      "Nyeri",
-      "Machakos",
-      "Other",
-    ],
-  },
+  type: String,
+  required: [true, "Please provide a county name."],
+  enum: [
+    "Baringo", "Bomet", "Bungoma", "Busia",
+    "Elgeyo-Marakwet", "Embu", "Garissa", "Homa Bay",
+    "Isiolo", "Kajiado", "Kakamega", "Kericho",
+    "Kiambu", "Kilifi", "Kirinyaga", "Kisii",
+    "Kisumu", "Kitui", "Kwale", "Laikipia",
+    "Lamu", "Machakos", "Makueni", "Mandera",
+    "Marsabit", "Meru", "Migori", "Mombasa",
+    "Murang'a", "Nairobi", "Nakuru", "Nandi",
+    "Narok", "Nyamira", "Nyandarua", "Nyeri",
+    "Samburu", "Siaya", "Taita-Taveta", "Tana River",
+    "Tharaka-Nithi", "Trans Nzoia", "Turkana",
+    "Uasin Gishu", "Vihiga", "Wajir", "West Pokot"
+  ],
+},
+
   location: {
     type: String,
     required: [true, "Please provide location."],
