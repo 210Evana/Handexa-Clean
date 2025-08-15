@@ -3,7 +3,8 @@ import { getAllUsers,
          updateUserStatus, 
          getAllJobs, 
          updateJobStatus, 
-         adminGetAllApplications, 
+         adminGetAllApplications,
+         getAdminStats, 
          
  } from "../controllers/adminController.js";
 import { isAuthorized, isAdmin } from "../middlewares/auth.js";
@@ -16,5 +17,6 @@ router.put("/users/:id/status", isAuthorized, isAdmin, updateUserStatus);
 router.get("/jobs", isAuthorized, isAdmin, getAllJobs);
 router.put("/jobs/:id/status", isAuthorized, isAdmin, updateJobStatus);
 router.get("/applications", isAuthorized, isAdmin, adminGetAllApplications);
+router.get("/stats", isAuthorized, isAdmin, getAdminStats);
 
 export default router;

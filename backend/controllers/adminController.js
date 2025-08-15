@@ -20,9 +20,30 @@ export const getAllJobs = catchAsyncErrors(async (req, res, next) => { const job
 
 export const updateJobStatus = catchAsyncErrors(async (req, res, next) => { const { id } = req.params; const { status } = req.body; const job = await Job.findById(id); if (!job) return next(new ErrorHandler("Job not found", 404)); job.status = status; await job.save(); res.status(200).json({ success: true, message: "Job status updated", job }); });
 
+
 export const adminGetAllApplications = catchAsyncErrors(async (req, res, next) => { 
     const applications = await Application.find() 
     .populate("applicantID.user", "name email role") 
     .populate("employerID.user", "name email role") .populate("job", "title status");
 
 res.status(200).json({ success: true, application: applications }); });
+
+
+export const getAdminStats = catchAsyncErrors(async (req, res, next) => {
+  const totalUsers = await User.countDocuments();
+  const totalEmployers = await User.countDocuments({ role: "employer" });
+  const totalJobSeekers = await User.countDocuments({ role: "jobseeker" });
+  const totalJobs = await Job.countDocuments();
+  const totalApplications = await Application.countDocuments();
+
+  res.status(200).json({
+    success: true,
+    stats: {
+      totalUsers,
+      totalEmployers,
+      totalJobSeekers,
+      totalJobs,
+      totalApplications,
+    },
+  });
+});

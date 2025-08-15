@@ -9,6 +9,16 @@ const AdminDashboard = () => {
   const [jobs, setJobs] = useState([]);
   const [applications, setApplications] = useState([]);
 
+  const [stats, setStats] = useState(null);
+
+useEffect(() => {
+  axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/stats`, {
+    withCredentials: true,
+  })
+  .then(res => setStats(res.data.stats))
+  .catch(err => toast.error("Failed to load stats"));
+}, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -26,14 +36,14 @@ const AdminDashboard = () => {
           });
 
           setJobs(res.data.jobs);
-        } else if (view === "applications") {
-          const res = await 
-          axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/users`, {
-          withCredentials: true,
-       });
+       else if (view === "applications") {
+  const res = await axios.get(
+    `${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/applications`,
+    { withCredentials: true }
+  );
+  setApplications(res.data.application); // matches your backend key
+}
 
-          setApplications(res.data.applications);
-        }
       } catch (err) {
         toast.error(err.response?.data?.message || "Error loading data");
       }
@@ -117,6 +127,16 @@ const AdminDashboard = () => {
             </tbody>
           </table>
         )}
+        {stats && (
+  <div className="stats-bar">
+    <p>Total Users: {stats.totalUsers}</p>
+    <p>Employers: {stats.totalEmployers}</p>
+    <p>Job Seekers: {stats.totalJobSeekers}</p>
+    <p>Jobs Posted: {stats.totalJobs}</p>
+    <p>Applications Made: {stats.totalApplications}</p>
+  </div>
+)}
+
 
         {view === "jobs" && (
           <table>
