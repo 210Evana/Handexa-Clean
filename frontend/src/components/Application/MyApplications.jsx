@@ -15,26 +15,27 @@ const MyApplications = () => {
   const navigateTo = useNavigate();
 
   useEffect(() => {
-    const fetchApplications = async () => {
-      setLoading(true);
-      try {
-        const endpoint =
-          user?.role === "Employer"
-            ? `${import.meta.env.VITE_BACKEND_URL}/api/v1/application/employer/getall`
-            : `${import.meta.env.VITE_BACKEND_URL}/api/v1/application/jobseeker/getall`;
-        const { data } = await axios.get(endpoint, { withCredentials: true });
-        setApplications(data.applications || []);
-      } catch (error) {
-        console.error("Fetch applications error:", error);
-        toast.error(error.response?.data?.message || "Failed to fetch applications");
-      } finally {
-        setLoading(false);
-      }
-    };
-    if (isAuthorized && user) {
-      fetchApplications();
+  const fetchApplications = async () => {
+    setLoading(true);
+    try {
+      const endpoint =
+        user?.role === "Employer"
+          ? `${import.meta.env.VITE_BACKEND_URL}/api/v1/application/employer/getall`
+          : `${import.meta.env.VITE_BACKEND_URL}/api/v1/application/jobseeker/getall`;
+      const { data } = await axios.get(endpoint, { withCredentials: true });
+      console.log("Fetched applications:", data.applications); // Debug log
+      setApplications(data.applications || []);
+    } catch (error) {
+      console.error("Fetch applications error:", error);
+      toast.error(error.response?.data?.message || "Failed to fetch applications");
+    } finally {
+      setLoading(false);
     }
-  }, [isAuthorized, user]);
+  };
+  if (isAuthorized && user) {
+    fetchApplications();
+  }
+}, [isAuthorized, user]);
 
   if (!isAuthorized) {
     navigateTo("/");
