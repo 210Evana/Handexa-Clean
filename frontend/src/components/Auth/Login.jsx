@@ -47,15 +47,17 @@ const Login = () => {
       <div className="container">
         <div className="header">
           <div
-            className="logo-bg rounded-circle d-flex align-items-center justify-content-center me-3"
-            style={{ width: "110px", height: "60px" }}
-          >
-            <span className="logo-text text-white fs-3">Welcome</span>
-          </div>
-          <h1 className="logo-text m-0">
-            <span className="logo-hand">Hand</span>
-            <span className="logo-exa">Exa</span>
-          </h1>
+  className="logo-bg rounded-circle d-flex align-items-center justify-content-center me-3 overflow-hidden"
+  style={{ width: "110px", height: "60px" }}
+>
+  <span className="logo-text text-white fs-5 moving-welcome">
+    Welcome
+  </span>
+</div>
+<h1 className="logo-text m-0">
+  <span className="logo-hand">Hand</span>
+  <span className="logo-exa">Exa</span>
+</h1>
           <h3>Login to your account</h3>
         </div>
 

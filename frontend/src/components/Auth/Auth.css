@@ -5,24 +5,8 @@
             font-size: 1.5em;
             color: #333;
         }
-        .logo-hand {
-            color: rgb(194, 111, 154);
-            font-size: 1.2em;
-            font-weight: 900;
-            font-style: italic;
-            margin-right: 0.2em;
-        }
-        .logo-exa {
-            color: hsl(281, 90%, 24%);
-            font-size: 1.2em;
-            font-weight: 900;
-        }
-        .logo-bg {
-            background-color: #20a6cf;
-            font-weight:900;
-            color: white;
-            padding: 0.2em 0.4em;
-        }
+        
+        
         /* Improve form appearance */
 .authPage .container {
   background: #ffffff;
@@ -104,4 +88,30 @@
 }
 .authPage a:hover {
   text-decoration: underline;
+}
+/* Moving Welcome Text */
+.moving-welcome {
+  display: inline-block;
+  white-space: nowrap;
+  animation: slide-left 8s linear infinite;
+}
+
+@keyframes slide-left {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* Logo Colors */
+.logo-hand {
+  color: #ff5722; /* Deep Orange */
+  font-weight: bold;
+}
+
+.logo-exa {
+  color: #2196f3; /* Bright Blue */
+  font-weight: bold;
 }
