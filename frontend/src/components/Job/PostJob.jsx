@@ -52,7 +52,7 @@ const PostJob = () => {
       )
       .then((res) => {
         toast.success(res.data.message);
-        navigateTo("/job/getmyjobs");
+        navigateTo("/job/post");
       })
       .catch((err) => {
         toast.error(err.response?.data?.message || "Failed to post job.");
