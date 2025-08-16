@@ -7,6 +7,7 @@ import HowItWorks from "./HowItWorks";
 import PopularCategories from "./PopularCategories";
 import PopularCompanies from "./PopularCompanies";
 import "./Home.css"
+import FAQ from "./FAQ";
 
 const Home = () => {
   const { isAuthorized } = useContext(Context);
@@ -20,6 +21,7 @@ const Home = () => {
         <HowItWorks />
         <PopularCategories />
         <PopularCompanies />
+        <FAQ/>
       </section>
     </>
   );
