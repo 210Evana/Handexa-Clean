@@ -50,12 +50,12 @@ if (isAuthorized && user) {
         <div className="container">
           <div className="header">
             <div className="logo-marquee" aria-hidden="true">
-              <span className="moving-welcome">WELCOME • WELCOME • WELCOME • </span>
+              <span className="moving-welcome">WELCOME • WELCOME </span>
             </div>
 
             <h1 className="logo-text m-0" aria-label="HandExa">
-              <span className="logo-hand">Hand</span>
-              <span className="logo-exa">Exa</span>
+              <span className="logo-hand">HAND</span>
+              <span className="logo-exa">EXA</span>
             </h1>
 
             <h3>Login to your account</h3>

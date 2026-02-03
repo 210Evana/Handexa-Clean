@@ -1,5 +1,6 @@
 # Sensitive files
 **/config.env
+**/.env
 
 
 # Dependencies

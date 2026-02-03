@@ -12,7 +12,7 @@ import cookieParser from "cookie-parser";
 import fileUpload from "express-fileupload";
 
 const app = express();
-config({ path: "./config/config.env" });
+config({ path: "./config.env" });
 
 // Middleware setup
 app.use(
@@ -44,7 +44,7 @@ app.use("/api/v1/admin", AdminRouter);
 dbConnection();
 
 app.get("/", (req, res) => {
-  res.send("🟢 Handexa backend is running smoothly.");
+  res.send("🟢 Handexa Yvana!!!! backend is running smoothly.");
 });
 
 
