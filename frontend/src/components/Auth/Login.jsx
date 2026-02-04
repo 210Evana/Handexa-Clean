@@ -117,12 +117,14 @@ const Login = () => {
                     className="form-input password-input"
                     aria-label="Password"
                   />
-                  <button
+                    <button
                     type="button"
                     className="password-toggle-btn"
                     onClick={() => setShowPassword(!showPassword)}
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
+                    {/* When password is visible (showPassword=true), show EyeSlash to hide it */}
+                    {/* When password is hidden (showPassword=false), show Eye to reveal it */}
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
                 </div>
