@@ -59,8 +59,8 @@ const Register = () => {
             </div>
 
             <h1 className="logo-text m-0" aria-label="HandExa">
-              <span className="logo-hand">Hand</span>
-              <span className="logo-exa">Exa</span>
+              <span className="logo-hand">HAND</span>
+              <span className="logo-exa">EXA</span>
             </h1>
 
             <h3>Create a new account</h3>
