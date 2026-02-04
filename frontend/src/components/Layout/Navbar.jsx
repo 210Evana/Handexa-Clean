@@ -1,19 +1,21 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import { Context } from "../../main";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { FaHome, FaBriefcase, FaFileAlt, FaPlus, FaList } from "react-icons/fa";
+import { FaHome, FaBriefcase, FaFileAlt, FaPlus, FaList, FaUser, FaSignOutAlt, FaChevronDown } from "react-icons/fa";
 import "./Navbar.css";
 
 const Navbar = () => {
   const [show, setShow] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [category, setCategory] = useState("");
   const [county, setCounty] = useState("");
   const { isAuthorized, setIsAuthorized, user, setUser } = useContext(Context);
   const navigateTo = useNavigate();
   const location = useLocation();
+  const dropdownRef = useRef(null);
 
   const categories = [
     "Cleaning & Domestic Services",
@@ -57,6 +59,20 @@ const Navbar = () => {
     }
   }, [isAuthorized]);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowProfileDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const fetchUser = async () => {
     try {
       const response = await axios.get(
@@ -92,6 +108,10 @@ const Navbar = () => {
       setCategory("");
       setCounty("");
     }
+  };
+
+  const toggleProfileDropdown = () => {
+    setShowProfileDropdown(!showProfileDropdown);
   };
 
   return (
@@ -175,16 +195,56 @@ const Navbar = () => {
           </form>
         )}
 
-        <div className="profile-section">
-          <div className="profile-container">
+        {/* Profile Dropdown */}
+        <div className="profile-section" ref={dropdownRef}>
+          <button 
+            className="profile-trigger"
+            onClick={toggleProfileDropdown}
+            aria-expanded={showProfileDropdown}
+            aria-haspopup="true"
+          >
             <img
               src={user?.avatar?.url || "/default-profile.png"}
               alt="Profile"
               className="profile-pic"
             />
             <span className="user-name">{user?.name || "Guest"}</span>
-          </div>
-          <button onClick={handleLogout} className="logout-btn">Logout</button>
+            <FaChevronDown className={`dropdown-arrow ${showProfileDropdown ? 'open' : ''}`} />
+          </button>
+
+          {showProfileDropdown && (
+            <div className="profile-dropdown">
+              <div className="dropdown-header">
+                <img
+                  src={user?.avatar?.url || "/default-profile.png"}
+                  alt="Profile"
+                  className="dropdown-profile-pic"
+                />
+                <div className="dropdown-user-info">
+                  <p className="dropdown-name">{user?.name || "Guest"}</p>
+                  <p className="dropdown-email">{user?.email || ""}</p>
+                  <span className="dropdown-role">{user?.role || "User"}</span>
+                </div>
+              </div>
+
+              <div className="dropdown-divider"></div>
+
+              <ul className="dropdown-menu">
+                <li>
+                  <Link to="/profile" onClick={() => setShowProfileDropdown(false)}>
+                    <FaUser className="dropdown-icon" />
+                    <span>Edit Profile</span>
+                  </Link>
+                </li>
+                <li>
+                  <button onClick={handleLogout} className="dropdown-logout">
+                    <FaSignOutAlt className="dropdown-icon" />
+                    <span>Logout</span>
+                  </button>
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
 
         <div className="hamburger">
