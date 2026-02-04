@@ -125,7 +125,7 @@ const Login = () => {
                   >
                     {/* When password is visible (showPassword=true), show EyeSlash to hide it */}
                     {/* When password is hidden (showPassword=false), show Eye to reveal it */}
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    {showPassword ? <FaEye /> : <FaEyeSlash />}
                   </button>
                 </div>
               </div>
