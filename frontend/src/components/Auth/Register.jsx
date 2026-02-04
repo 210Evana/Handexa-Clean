@@ -52,109 +52,145 @@ const Register = () => {
   return (
     <>
       <section className="authPage auth-register">
-        <div className="container">
-          <div className="header">
-            <div className="logo-marquee" aria-hidden="true">
-              <span className="moving-welcome">WELCOME • WELCOME • WELCOME • </span>
+        <div className="auth-container">
+          <div className="auth-card">
+            <div className="auth-header">
+              <div className="brand-wrapper">
+                <h1 className="brand-name">
+                  <span className="brand-hand">HAND</span>
+                  <span className="brand-exa">EXA</span>
+                </h1>
+                <div className="brand-tagline">Connecting Informal Workers & Employers</div>
+              </div>
+              <h2 className="auth-title">Create your account</h2>
+              <p className="auth-subtitle">Join thousands of workers and employers building successful partnerships</p>
             </div>
 
-            <h1 className="logo-text m-0" aria-label="HandExa">
-              <span className="logo-hand">HAND</span>
-              <span className="logo-exa">EXA</span>
-            </h1>
+            <form onSubmit={handleRegister} className="auth-form">
+              <div className="form-group">
+                <label htmlFor="role" className="form-label">
+                  Account Type
+                </label>
+                <div className="input-wrapper">
+                  <FaRegUser className="input-icon" />
+                  <select
+                    id="role"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    required
+                    className="form-select"
+                  >
+                    <option value="">Select your role</option>
+                    <option value="Employer">Employer</option>
+                    <option value="Job Seeker">Job Seeker</option>
+                  </select>
+                </div>
+              </div>
 
-            <h3>Create a new account</h3>
+              <div className="form-group">
+                <label htmlFor="name" className="form-label">
+                  Full Name
+                </label>
+                <div className="input-wrapper">
+                  <FaPencilAlt className="input-icon" />
+                  <input
+                    id="name"
+                    type="text"
+                    placeholder="John Doe"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    className="form-input"
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="email" className="form-label">
+                  Email Address
+                </label>
+                <div className="input-wrapper">
+                  <MdOutlineMailOutline className="input-icon" />
+                  <input
+                    id="email"
+                    type="email"
+                    placeholder="your.email@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="form-input"
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="phone" className="form-label">
+                  Phone Number
+                </label>
+                <div className="input-wrapper">
+                  <FaPhoneFlip className="input-icon" />
+                  <input
+                    id="phone"
+                    type="tel"
+                    placeholder="+254 712 345 678"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    required
+                    className="form-input"
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="password" className="form-label">
+                  Password
+                </label>
+                <div className="input-wrapper">
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Create a strong password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="form-input password-input"
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
+              </div>
+
+              <button type="submit" className="auth-button">
+                Create Account
+              </button>
+
+              <div className="auth-footer">
+                <p className="footer-text">
+                  Already have an account?{" "}
+                  <Link to="/login" className="footer-link">
+                    Sign in
+                  </Link>
+                </p>
+              </div>
+            </form>
           </div>
 
-          <form onSubmit={handleRegister}>
-            <div className="inputTag">
-              <label>Register As</label>
-              <div>
-                <select value={role} onChange={(e) => setRole(e.target.value)} required>
-                  <option value="">Select Role</option>
-                  <option value="Employer">Employer</option>
-                  <option value="Job Seeker">Job Seeker</option>
-                </select>
-                <FaRegUser />
+          <div className="auth-visual">
+            <div className="visual-content">
+              <div className="visual-overlay"></div>
+              <img src="/login.avif" alt="Professional workspace" className="visual-image" />
+              <div className="visual-text">
+                <h3>Build Your Network</h3>
+                <p>Whether you're a skilled craftsperson, day laborer, or service provider - connect with employers who respect and value your work.</p>
               </div>
             </div>
-
-            <div className="inputTag">
-              <label>Name</label>
-              <div>
-                <input
-                  type="text"
-                  placeholder="Tavian"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
-                <FaPencilAlt />
-              </div>
-            </div>
-
-            <div className="inputTag">
-              <label>Email Address</label>
-              <div>
-                <input
-                  type="email"
-                  placeholder="evanajuma2003@gmail.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-                <MdOutlineMailOutline />
-              </div>
-            </div>
-
-            <div className="inputTag">
-              <label>Phone Number</label>
-              <div>
-                <input
-                  type="tel"
-                  placeholder="0712345678"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  required
-                />
-                <FaPhoneFlip />
-              </div>
-            </div>
-
-            <div className="inputTag">
-              <label>Password</label>
-              <div>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Your Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-
-                {showPassword ? (
-                  <FaEyeSlash
-                    className="password-toggle"
-                    title="Hide password"
-                    onClick={() => setShowPassword(false)}
-                  />
-                ) : (
-                  <FaEye
-                    className="password-toggle"
-                    title="Show password"
-                    onClick={() => setShowPassword(true)}
-                  />
-                )}
-              </div>
-            </div>
-
-            <button type="submit">Register</button>
-            <Link to="/login">Login Now</Link>
-          </form>
-        </div>
-
-        <div className="banner">
-          <img src="/login.avif" alt="login" />
+          </div>
         </div>
       </section>
     </>

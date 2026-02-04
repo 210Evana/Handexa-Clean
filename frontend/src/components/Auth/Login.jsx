@@ -33,98 +33,126 @@ const Login = () => {
       toast.error(error.response?.data?.message || "Login failed");
     }
   };
+
   // Redirect based on role
-if (isAuthorized && user) {
-  if (user.role === "Admin") {
-    return <Navigate to="/admin/dashboard" />;
-  } else {
-    return <Navigate to="/" />;
+  if (isAuthorized && user) {
+    if (user.role === "Admin") {
+      return <Navigate to="/admin/dashboard" />;
+    } else {
+      return <Navigate to="/" />;
+    }
   }
-}
 
   if (isAuthorized) return <Navigate to="/" />;
 
   return (
     <>
       <section className="authPage auth-login">
-        <div className="container">
-          <div className="header">
-            <div className="logo-marquee" aria-hidden="true">
-              <span className="moving-welcome">WELCOME • WELCOME </span>
+        <div className="auth-container">
+          <div className="auth-card">
+            <div className="auth-header">
+              <div className="brand-wrapper">
+                <h1 className="brand-name">
+                  <span className="brand-hand">HAND</span>
+                  <span className="brand-exa">EXA</span>
+                </h1>
+                <div className="brand-tagline">Connecting Informal Workers & Employers</div>
+              </div>
+              <h2 className="auth-title">Welcome back</h2>
+              <p className="auth-subtitle">Sign in to continue to your account</p>
             </div>
 
-            <h1 className="logo-text m-0" aria-label="HandExa">
-              <span className="logo-hand">HAND</span>
-              <span className="logo-exa">EXA</span>
-            </h1>
+            <form onSubmit={handleLogin} className="auth-form">
+              <div className="form-group">
+                <label htmlFor="role" className="form-label">
+                  Account Type
+                </label>
+                <div className="input-wrapper">
+                  <FaRegUser className="input-icon" />
+                  <select
+                    id="role"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    required
+                    className="form-select"
+                  >
+                    <option value="">Select your role</option>
+                    <option value="Employer">Employer</option>
+                    <option value="Job Seeker">Job Seeker</option>
+                    <option value="Admin">Admin</option>
+                  </select>
+                </div>
+              </div>
 
-            <h3>Login to your account</h3>
+              <div className="form-group">
+                <label htmlFor="email" className="form-label">
+                  Email Address
+                </label>
+                <div className="input-wrapper">
+                  <MdOutlineMailOutline className="input-icon" />
+                  <input
+                    id="email"
+                    type="email"
+                    placeholder="your.email@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="form-input"
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="password" className="form-label">
+                  Password
+                </label>
+                <div className="input-wrapper">
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="form-input password-input"
+                    aria-label="Password"
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
+              </div>
+
+              <button type="submit" className="auth-button">
+                Sign In
+              </button>
+
+              <div className="auth-footer">
+                <p className="footer-text">
+                  Don't have an account?{" "}
+                  <Link to="/register" className="footer-link">
+                    Create account
+                  </Link>
+                </p>
+              </div>
+            </form>
           </div>
 
-          <form onSubmit={handleLogin}>
-            <div className="inputTag">
-              <label>Login As</label>
-              <div>
-                <select value={role} onChange={(e) => setRole(e.target.value)} required>
-                  <option value="">Select Role</option>
-                  <option value="Employer">Employer</option>
-                  <option value="Job Seeker">Job Seeker</option>
-                  <option value="Admin">Admin</option>
-                </select>
-                <FaRegUser />
+          <div className="auth-visual">
+            <div className="visual-content">
+              <div className="visual-overlay"></div>
+              <img src="/login.avif" alt="Professional workspace" className="visual-image" />
+              <div className="visual-text">
+                <h3>Your Skills, Your Success</h3>
+                <p>Join thousands of informal workers finding fair opportunities and building lasting connections with employers who value your expertise.</p>
               </div>
             </div>
-
-            <div className="inputTag">
-              <label>Email Address</label>
-              <div>
-                <input
-                  type="email"
-                  placeholder="evana2003@gmail.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-                <MdOutlineMailOutline />
-              </div>
-            </div>
-
-            <div className="inputTag">
-              <label>Password</label>
-              <div>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Your Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  aria-label="Password"
-                />
-
-                {/* Correct behavior: Eye = show (when hidden), EyeSlash = hide (when visible) */}
-                {showPassword ? (
-                  <FaEyeSlash
-                    className="password-toggle"
-                    title="Hide password"
-                    onClick={() => setShowPassword(false)}
-                  />
-                ) : (
-                  <FaEye
-                    className="password-toggle"
-                    title="Show password"
-                    onClick={() => setShowPassword(true)}
-                  />
-                )}
-              </div>
-            </div>
-
-            <button type="submit">Login</button>
-            <Link to="/register">Register Now</Link>
-          </form>
-        </div>
-
-        <div className="banner">
-          <img src="/login.avif" alt="login" />
+          </div>
         </div>
       </section>
     </>
