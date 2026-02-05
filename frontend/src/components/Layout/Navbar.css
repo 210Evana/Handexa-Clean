@@ -163,6 +163,7 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
   overflow: hidden;
   animation: dropdownFade 0.2s ease-out;
+  z-index: 9999;
 }
 
 @keyframes dropdownFade {

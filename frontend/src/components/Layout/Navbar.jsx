@@ -17,7 +17,7 @@ import {
 import "./Navbar.css";
 
 const Navbar = () => {
-  const [show, setShow] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [category, setCategory] = useState("");
   const [county, setCounty] = useState("");
@@ -25,7 +25,7 @@ const Navbar = () => {
   const { isAuthorized, setIsAuthorized, user, setUser } =
     useContext(Context);
 
-  const navigateTo = useNavigate();
+  const navigate = useNavigate();
   const location = useLocation();
   const dropdownRef = useRef(null);
 
@@ -33,35 +33,41 @@ const Navbar = () => {
      FETCH USER (COOKIE AUTH)
      ======================== */
   useEffect(() => {
-    if (isAuthorized) fetchUser();
-  }, [isAuthorized]);
+    if (!isAuthorized) return;
 
-  const fetchUser = async () => {
-    try {
-      const { data } = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/getuser`,
-        { withCredentials: true }
-      );
-      setUser(data.user);
-      setIsAuthorized(true);
-    } catch {
-      setUser(null);
-      setIsAuthorized(false);
-    }
-  };
+    const fetchUser = async () => {
+      try {
+        const { data } = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/getuser`,
+          { withCredentials: true }
+        );
+        setUser(data.user);
+        setIsAuthorized(true);
+      } catch {
+        setUser(null);
+        setIsAuthorized(false);
+      }
+    };
+
+    fetchUser();
+  }, [isAuthorized, setIsAuthorized, setUser]);
 
   /* ========================
-     CLOSE DROPDOWN ON CLICK
+     CLOSE DROPDOWN ON OUTSIDE CLICK
      ======================== */
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target)
+      ) {
         setShowProfileDropdown(false);
       }
     };
-    document.addEventListener("click", handleClickOutside);
+
+    document.addEventListener("mousedown", handleClickOutside);
     return () =>
-      document.removeEventListener("click", handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   /* ========================
@@ -76,7 +82,7 @@ const Navbar = () => {
       toast.success(data.message);
       setUser(null);
       setIsAuthorized(false);
-      navigateTo("/login");
+      navigate("/login");
     } catch {
       toast.error("Logout failed");
     }
@@ -89,11 +95,12 @@ const Navbar = () => {
     e.preventDefault();
     if (!category && !county) return;
 
-    navigateTo(
+    navigate(
       `/job/search?category=${encodeURIComponent(
         category
       )}&county=${encodeURIComponent(county)}`
     );
+
     setCategory("");
     setCounty("");
   };
@@ -101,7 +108,7 @@ const Navbar = () => {
   /* ========================
      DATA
      ======================== */
- const categories = [
+  const categories = [
     "Cleaning & Domestic Services",
     "Chefs & Cooks",
     "Nannies",
@@ -124,18 +131,17 @@ const Navbar = () => {
     "Drivers",
     "Farming & Agriculture",
     "Food Vending & Catering",
-    "Other Informal Jobs"
+    "Other Informal Jobs",
   ];
 
-
- const counties = [
-    "Baringo", "Bomet", "Bungoma", "Busia", "Elgeyo-Marakwet", "Embu", "Garissa",
-    "Homa Bay", "Isiolo", "Kajiado", "Kakamega", "Kericho", "Kiambu", "Kilifi",
-    "Kirinyaga", "Kisii", "Kisumu", "Kitui", "Kwale", "Laikipia", "Lamu",
-    "Machakos", "Makueni", "Mandera", "Marsabit", "Meru", "Migori", "Mombasa",
-    "Murang'a", "Nairobi", "Nakuru", "Nandi", "Narok", "Nyamira", "Nyandarua",
-    "Nyeri", "Samburu", "Siaya", "Taita-Taveta", "Tana River", "Tharaka-Nithi",
-    "Trans Nzoia", "Turkana", "Uasin Gishu", "Vihiga", "Wajir", "West Pokot"
+  const counties = [
+    "Baringo","Bomet","Bungoma","Busia","Elgeyo-Marakwet","Embu","Garissa",
+    "Homa Bay","Isiolo","Kajiado","Kakamega","Kericho","Kiambu","Kilifi",
+    "Kirinyaga","Kisii","Kisumu","Kitui","Kwale","Laikipia","Lamu",
+    "Machakos","Makueni","Mandera","Marsabit","Meru","Migori","Mombasa",
+    "Murang'a","Nairobi","Nakuru","Nandi","Narok","Nyamira","Nyandarua",
+    "Nyeri","Samburu","Siaya","Taita-Taveta","Tana River","Tharaka-Nithi",
+    "Trans Nzoia","Turkana","Uasin Gishu","Vihiga","Wajir","West Pokot",
   ];
 
   /* ========================
@@ -144,27 +150,28 @@ const Navbar = () => {
   return (
     <nav className={isAuthorized ? "navbarShow" : "navbarHide"}>
       <div className="container">
+        {/* LOGO */}
         <h1 className="logo-text">
           <span className="logo-hand">Hand</span>
           <span className="logo-exa">Exa</span>
         </h1>
 
-        {/* ===== MENU ===== */}
-        <ul className={show ? "menu show-menu" : "menu"}>
+        {/* MENU */}
+        <ul className={`menu ${showMenu ? "show-menu" : ""}`}>
           {user?.role !== "Admin" && (
             <>
               <li>
-                <Link to="/" onClick={() => setShow(false)}>
+                <Link to="/" onClick={() => setShowMenu(false)}>
                   <FaHome /> Home
                 </Link>
               </li>
               <li>
-                <Link to="/job/getall" onClick={() => setShow(false)}>
+                <Link to="/job/getall" onClick={() => setShowMenu(false)}>
                   <FaBriefcase /> Jobs
                 </Link>
               </li>
               <li>
-                <Link to="/applications/me" onClick={() => setShow(false)}>
+                <Link to="/applications/me" onClick={() => setShowMenu(false)}>
                   <FaFileAlt /> Applications
                 </Link>
               </li>
@@ -172,12 +179,12 @@ const Navbar = () => {
               {user?.role === "Employer" && (
                 <>
                   <li>
-                    <Link to="/job/post" onClick={() => setShow(false)}>
+                    <Link to="/job/post" onClick={() => setShowMenu(false)}>
                       <FaPlus /> Post Job
                     </Link>
                   </li>
                   <li>
-                    <Link to="/job/me" onClick={() => setShow(false)}>
+                    <Link to="/job/me" onClick={() => setShowMenu(false)}>
                       <FaList /> My Jobs
                     </Link>
                   </li>
@@ -195,7 +202,7 @@ const Navbar = () => {
           )}
         </ul>
 
-        {/* ===== SEARCH ===== */}
+        {/* SEARCH */}
         {user?.role === "Job Seeker" &&
           location.pathname.startsWith("/job") && (
             <form className="search-bar" onSubmit={handleSearch}>
@@ -223,7 +230,7 @@ const Navbar = () => {
             </form>
           )}
 
-        {/* ===== PROFILE DROPDOWN ===== */}
+        {/* PROFILE DROPDOWN */}
         {isAuthorized && user && (
           <div className="profile-section" ref={dropdownRef}>
             <button
@@ -231,6 +238,8 @@ const Navbar = () => {
               onClick={() =>
                 setShowProfileDropdown((prev) => !prev)
               }
+              aria-haspopup="true"
+              aria-expanded={showProfileDropdown}
             >
               <img
                 src={user.avatar?.url || "/default-profile.png"}
@@ -238,24 +247,33 @@ const Navbar = () => {
                 alt="profile"
               />
               <span className="user-name">{user.name}</span>
-              <FaChevronDown />
+              <FaChevronDown
+                className={`dropdown-arrow ${
+                  showProfileDropdown ? "open" : ""
+                }`}
+              />
             </button>
 
             {showProfileDropdown && (
               <div className="profile-dropdown">
                 <div className="dropdown-header">
-                  <p>{user.email}</p>
-                  <span>{user.role}</span>
+                  <p className="dropdown-email">{user.email}</p>
+                  <span className="dropdown-role">{user.role}</span>
                 </div>
+
+                <div className="dropdown-divider" />
 
                 <ul className="dropdown-menu">
                   <li>
-                    <Link to="/profile">
+                    <Link
+                      to="/profile"
+                      onClick={() => setShowProfileDropdown(false)}
+                    >
                       <FaUser /> Edit Profile
                     </Link>
                   </li>
                   <li>
-                    <button onClick={handleLogout}>
+                    <button onClick={handleLogout} className="dropdown-logout">
                       <FaSignOutAlt /> Logout
                     </button>
                   </li>
@@ -265,9 +283,9 @@ const Navbar = () => {
           </div>
         )}
 
-        {/* ===== HAMBURGER ===== */}
+        {/* HAMBURGER */}
         <div className="hamburger">
-          <GiHamburgerMenu onClick={() => setShow(!show)} />
+          <GiHamburgerMenu onClick={() => setShowMenu(!showMenu)} />
         </div>
       </div>
     </nav>
