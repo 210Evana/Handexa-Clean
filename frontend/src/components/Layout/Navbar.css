@@ -161,7 +161,7 @@
   min-width: 240px;
   border-radius: 14px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-  overflow: hidden;
+  overflow: visible;
   animation: dropdownFade 0.2s ease-out;
   z-index: 9999;
 }
@@ -229,6 +229,19 @@
 
 .dropdown-menu li button:hover {
   background: rgba(220, 38, 38, 0.1);
+}
+.dropdown-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 4px 0;
+}
+.dropdown-arrow {
+  font-size: 12px;
+  transition: transform 0.2s ease;
+}
+
+.dropdown-arrow.open {
+  transform: rotate(180deg);
 }
 
 /* ========================================
