@@ -263,7 +263,7 @@ const Navbar = () => {
 
                 <div className="dropdown-divider" />
 
-                <ul className="dropdown-menu">
+               <ul className="profile-nav-menu">
                   <li>
                     <Link
                       to="/profile"
