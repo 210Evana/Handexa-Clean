@@ -245,6 +245,23 @@
   transform: rotate(180deg);
 }
 
+.dropdown-logout {
+  background-color: transparent !important;
+  color: #dc2626 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 10px 14px !important;
+}
+
+.dropdown-logout:hover {
+  background-color: rgba(220, 38, 38, 0.1) !important;
+  border-color: transparent !important;
+}
+
+.dropdown-logout:focus,
+.dropdown-logout:focus-visible {
+  outline: none !important;
+}
 /* ========================================
    HAMBURGER
 ======================================== */
