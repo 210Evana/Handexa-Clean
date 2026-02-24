@@ -171,7 +171,7 @@
 
 .card .text p:first-child {
   font-weight: 600;
-  color: #333;
+  color: #ffffff;
   font-size: 1.2rem;
 }
 
@@ -203,6 +203,10 @@
     margin: 10px auto;
     width: fit-content;
   }
+  .heroSection {
+  background: linear-gradient(135deg, #aa1196, #6a82fb);
+  margin-bottom: 80px;
+}
   .howitworks h3, .categories h3, .companies h3 {
     font-size: 2rem;
   }
@@ -211,10 +215,11 @@
   }
 }
 .final-cta {
-  background: #2e7d32;
-  color: white;
+  background: linear-gradient(135deg, #1b5e20, #2e7d32);
+  padding: 100px 20px;
   text-align: center;
-  padding: 80px 20px;
+  width: 100%;
+  border-radius: 0; /* remove floating feel */
 }
 
 .final-cta h2 {
