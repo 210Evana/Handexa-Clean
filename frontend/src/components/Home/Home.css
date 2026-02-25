@@ -212,11 +212,12 @@
   }
   .card {
     padding: 15px;
+    background: #ffffff;
   }
 }
 .final-cta {
-  background: linear-gradient(135deg, #1b5e20, #2e7d32);
-  padding: 100px 20px;
+  background:  #2e7d32;
+  padding: 80px 20px;
   text-align: center;
   width: 100%;
   border-radius: 0; /* remove floating feel */
