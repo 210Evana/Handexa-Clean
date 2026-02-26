@@ -1,13 +1,19 @@
 import { Message } from "../models/messageSchema.js";
 import { Application } from "../models/applicationSchema.js";
 import mongoose from "mongoose";
-import { io, roomUsers } from "../server.js"; // roomUsers is the presence map (added below)
 
-/* ─── Helper: check if the other party is currently in the room ─── */
-const isOtherUserInRoom = (roomId, senderId) => {
-  const usersInRoom = roomUsers[roomId];
+/* ─────────────────────────────────────────────────────────────────────────────
+   NOTE: We access `io` and `roomUsers` via req.app.get() instead of importing
+   from server.js directly. A direct import would create a circular dependency:
+     server.js → app.js → routes → controller → server.js  ← circular!
+   server.js already calls app.set("io", io) and app.set("roomUsers", roomUsers)
+   so we can safely read them from the Express app instance on each request.
+───────────────────────────────────────────────────────────────────────────── */
+
+/* ─── Helper: is the other party currently in the room? ─── */
+const isOtherUserInRoom = (roomUsers, roomId, senderId) => {
+  const usersInRoom = roomUsers?.[roomId];
   if (!usersInRoom) return false;
-  // Return true if anyone OTHER than the sender is in the room
   return [...usersInRoom].some((id) => id.toString() !== senderId.toString());
 };
 
@@ -27,7 +33,6 @@ export const getMessagesByApplication = async (req, res) => {
       return res.status(404).json({ message: "Application not found" });
     }
 
-    // Authorization: only the applicant or the employer can read messages
     if (
       application.applicantID.user.toString() !== req.user._id.toString() &&
       application.employerID.user.toString() !== req.user._id.toString()
@@ -72,12 +77,11 @@ export const sendMessage = async (req, res) => {
       return res.status(403).json({ message: "Not authorized to send messages for this application" });
     }
 
-    // ── Set initial status based on presence ──────────────────────
-    // If the recipient is already in the room → "delivered"
-    // Otherwise → "sent" (they'll get upgraded when they join)
-    const initialStatus = isOtherUserInRoom(applicationId, req.user._id)
-      ? "delivered"
-      : "sent";
+    // ── Determine initial status based on live presence ──
+    const roomUsers    = req.app.get("roomUsers") || {};
+    const initialStatus = isOtherUserInRoom(roomUsers, applicationId, req.user._id)
+      ? "delivered"   // recipient is already in the chat room
+      : "sent";       // recipient is offline / outside the room
 
     const newMessage = new Message({
       applicationId,
@@ -89,7 +93,8 @@ export const sendMessage = async (req, res) => {
     await newMessage.save();
     const populatedMessage = await newMessage.populate("sender", "name email");
 
-    // Broadcast to everyone in the socket room
+    // Emit to everyone in the socket room (sender + recipient)
+    const io = req.app.get("io");
     io.to(applicationId).emit("receiveMessage", populatedMessage);
 
     res.status(201).json({
@@ -105,9 +110,9 @@ export const sendMessage = async (req, res) => {
 
 /* ════════════════════════════════════════
    MARK messages as READ
-   Called when the recipient opens/focuses the chat.
-   Updates all unread messages in this application that
-   were NOT sent by the current user.
+   Called by the frontend when the chat is opened or the window regains focus.
+   Updates all unread messages in this room that weren't sent by the caller,
+   then emits "messagesRead" so the sender's ticks turn coloured in real-time.
 ════════════════════════════════════════ */
 export const markMessagesRead = async (req, res) => {
   try {
@@ -135,15 +140,14 @@ export const markMessagesRead = async (req, res) => {
       {
         applicationId,
         sender: { $ne: req.user._id },           // messages I did NOT send
-        status: { $in: ["sent", "delivered"] },   // not already read
+        status: { $in: ["sent", "delivered"] },  // not already read
       },
-      {
-        $set: { status: "read", readAt: now },
-      }
+      { $set: { status: "read", readAt: now } }
     );
 
     if (result.modifiedCount > 0) {
-      // Tell everyone in the room so the sender's ticks turn coloured
+      // Tell the sender their ticks should turn coloured
+      const io = req.app.get("io");
       io.to(applicationId).emit("messagesRead", {
         applicationId,
         readBy: req.user._id,

@@ -21,12 +21,17 @@ const io = new Server(server, {
   },
 });
 
-// ─── Presence map ────────────────────────────────────────────────────────────
+// ─── Presence map ─────────────────────────────────────────────────────────────
 // roomUsers[applicationId] = Set of userId strings currently in that room.
-// Exported so messageController.js can check presence when a message is sent.
-export const roomUsers = {};
+// Stored on the app instance so controllers can access it via req.app.get("roomUsers")
+// without creating a circular import.
+const roomUsers = {};
 
-// ─── Helper ──────────────────────────────────────────────────────────────────
+// Register both io and roomUsers on the app so controllers can use req.app.get()
+app.set("io", io);
+app.set("roomUsers", roomUsers);
+
+// ─── Helper ───────────────────────────────────────────────────────────────────
 function removeFromRoom(applicationId, userId) {
   if (!roomUsers[applicationId]) return;
   roomUsers[applicationId].delete(userId);
@@ -35,11 +40,11 @@ function removeFromRoom(applicationId, userId) {
   }
 }
 
-// ─── Socket.IO ───────────────────────────────────────────────────────────────
+// ─── Socket.IO ────────────────────────────────────────────────────────────────
 io.on("connection", (socket) => {
   console.log("New client connected:", socket.id);
 
-  // Frontend passes userId via socket.auth = { userId }
+  // Frontend passes userId via socket auth: io({ auth: (cb) => cb({ userId }) })
   const userId = socket.handshake.auth?.userId;
 
   // ── JOIN ROOM ──────────────────────────────────────────────────────────────
@@ -56,30 +61,29 @@ io.on("connection", (socket) => {
     if (!roomUsers[applicationId]) roomUsers[applicationId] = new Set();
     roomUsers[applicationId].add(userId?.toString());
 
-    // Tell the other person in the room this user is now online
+    // Tell the other person this user is now online → green dot
     socket.to(applicationId).emit("userOnline", { userId });
 
-    // Send back the current room members so the joiner can set the online dot
+    // Send the joining user a snapshot of who's already online
     socket.emit("roomPresence", {
       onlineUsers: [...roomUsers[applicationId]],
     });
 
-    // Upgrade "sent" → "delivered" for messages this user hasn't seen yet
-    // (they were sent while this user was offline / outside the room)
+    // Upgrade "sent" → "delivered" for any messages this user missed while offline
     try {
       const { Message } = await import("./models/messageSchema.js");
 
       const updated = await Message.updateMany(
         {
           applicationId,
-          sender: { $ne: userId },   // messages I did NOT send
-          status: "sent",            // only upgrade from "sent", not already "delivered"/"read"
+          sender: { $ne: userId },  // messages I did NOT send
+          status: "sent",           // only upgrade from "sent"
         },
         { $set: { status: "delivered" } }
       );
 
       if (updated.modifiedCount > 0) {
-        // Tell the sender(s) their messages are now delivered → grey double tick
+        // Tell everyone in the room → sender's ticks go grey double tick
         io.to(applicationId).emit("messagesDelivered", { applicationId });
         console.log(`Upgraded ${updated.modifiedCount} message(s) to delivered in room ${applicationId}`);
       }
@@ -108,8 +112,7 @@ io.on("connection", (socket) => {
   // ── DISCONNECT ─────────────────────────────────────────────────────────────
   socket.on("disconnect", () => {
     console.log("Client disconnected:", socket.id);
-
-    // Remove this user from every room they were in and notify others
+    // Clean up presence across all rooms
     Object.keys(roomUsers).forEach((applicationId) => {
       if (roomUsers[applicationId]?.has(userId?.toString())) {
         removeFromRoom(applicationId, userId?.toString());
@@ -122,9 +125,6 @@ io.on("connection", (socket) => {
     console.error("Socket.IO error:", error);
   });
 });
-
-// Keep app.set for any places that use req.app.get("io")
-app.set("io", io);
 
 server.listen(process.env.PORT, () => {
   console.log(`Server running at port ${process.env.PORT}`);
