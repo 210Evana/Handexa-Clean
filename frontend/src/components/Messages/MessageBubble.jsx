@@ -1,21 +1,24 @@
 import React from "react";
-import "./Messages.css";
-
+// CSS imported in parent MessagePage
 
 const MessageBubble = ({ message, isOwn, name }) => {
-  const bubbleClass = isOwn ? "message-bubble own" : "message-bubble";
-
-  // Format date function
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  const formatTime = (dateString) => {
+    if (!dateString) return "";
+    return new Date(dateString).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   return (
-    <div className={bubbleClass}>
-      <div className="username">{name}</div>
-      <p className="message-content">{message.message}</p>
-      <span className="message-time">{formatDate(message.createdAt)}</span>
+    <div className={`msg-bubble-group ${isOwn ? "own" : "other"}`}>
+      {!isOwn && <span className="msg-sender-name">{name}</span>}
+      <div className={`msg-bubble ${isOwn ? "own" : "other"}`}>
+        <p className="msg-bubble-text">{message.message}</p>
+        <div className="msg-bubble-meta">
+          <span className="msg-bubble-time">{formatTime(message.createdAt)}</span>
+        </div>
+      </div>
     </div>
   );
 };
