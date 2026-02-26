@@ -62,10 +62,10 @@ Handexa addresses these challenges by offering a centralized digital platform wh
 ![Dashboard](assets/jobseeker_homepage.png)
 
 ### 📊 Job Page
-![Dashboard](assets/job_page.png)
+![Job](assets/job_page.png)
 
 ### 📊 Post Job Page
-![Dashboard](assets/postjob.png)
+![Job](assets/postjob.png)
 
 ## 🔐 Core Features
 
