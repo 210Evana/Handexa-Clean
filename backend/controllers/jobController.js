@@ -4,8 +4,8 @@ import ErrorHandler from "../middlewares/error.js";
 
 export const getAllJobs = catchAsyncErrors(async (req, res, next) => {
   const jobs = await Job.find()
-    .populate("postedBy", "name email county")
-    .select("title category county location fixedSalary salaryFrom salaryTo expired jobPostedOn postedBy")
+    .populate("postedBy", "name email")
+    .select("title category county fixedSalary salaryFrom salaryTo expired postedBy")
     .lean();
 
   res.status(200).json({ success: true, jobs });
