@@ -3,51 +3,75 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import "./AdminDashboard.css";
 
-const TABS = ["users", "jobs", "applications"];
+const TABS = [
+  { key: "users",        label: "Users",        icon: "👤" },
+  { key: "jobs",         label: "Jobs",         icon: "💼" },
+  { key: "applications", label: "Applications", icon: "📋" },
+];
 
-const StatCard = ({ label, value, hint }) => (
-  <div className="stat-card">
-    <div className="stat-label">{label}</div>
-    <div className="stat-value">{value ?? 0}</div>
-    {hint ? <div className="stat-hint">{hint}</div> : null}
-  </div>
-);
+/* ─── Initials avatar ─── */
+const Avatar = ({ name }) => {
+  const letters = name
+    ? name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()
+    : "?";
+  return <span className="ad-avatar">{letters}</span>;
+};
 
+/* ─── Status / role pill ─── */
 const Pill = ({ text, tone = "neutral" }) => (
-  <span className={`pill pill-${tone}`}>{text}</span>
+  <span className={`ad-pill ad-pill-${tone}`}>{text}</span>
 );
 
+/* ─── Shimmer loading rows ─── */
+const ShimmerRows = ({ cols, rows = 5 }) => (
+  <>
+    {Array(rows).fill(0).map((_, i) => (
+      <tr className="ad-shimmer-row" key={i}>
+        {Array(cols).fill(0).map((_, j) => (
+          <td key={j}>
+            <div
+              className="ad-shimmer-cell"
+              style={{ width: j === 0 ? "60%" : j === cols - 1 ? "40%" : "75%" }}
+            />
+          </td>
+        ))}
+      </tr>
+    ))}
+  </>
+);
+
+/* ════════════════════════════════════════════════
+   MAIN COMPONENT
+════════════════════════════════════════════════ */
 const AdminDashboard = () => {
-  const [view, setView] = useState("users");
-  const [loading, setLoading] = useState(false);
-
-  const [stats, setStats] = useState(null);
-  const [users, setUsers] = useState([]);
-  const [jobs, setJobs] = useState([]);
+  const [view,         setView]         = useState("users");
+  const [loading,      setLoading]      = useState(false);
+  const [stats,        setStats]        = useState(null);
+  const [users,        setUsers]        = useState([]);
+  const [jobs,         setJobs]         = useState([]);
   const [applications, setApplications] = useState([]);
+  const [search,       setSearch]       = useState("");
+  const [roleFilter,   setRoleFilter]   = useState("all");
 
-  const [search, setSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState("all");
+  const today = new Date().toLocaleDateString("en-GB", {
+    weekday: "long", day: "numeric", month: "long", year: "numeric",
+  });
 
-  // -------- Load Stats (once) ----------
+  /* ── Stats (once) ── */
   useEffect(() => {
     axios
       .get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/stats`, {
         withCredentials: true,
       })
       .then((res) => setStats(res.data?.stats || null))
-      .catch((err) => {
-        console.error(err);
-        toast.error("Failed to load stats");
-      });
+      .catch(() => toast.error("Failed to load stats"));
   }, []);
 
-  // -------- Load Table Data (on tab change) ----------
+  /* ── Table data (on tab change) ── */
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
-
         if (view === "users") {
           const res = await axios.get(
             `${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/users`,
@@ -55,7 +79,6 @@ const AdminDashboard = () => {
           );
           setUsers(res.data?.users || []);
         }
-
         if (view === "jobs") {
           const res = await axios.get(
             `${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/jobs`,
@@ -63,58 +86,49 @@ const AdminDashboard = () => {
           );
           setJobs(res.data?.jobs || []);
         }
-
         if (view === "applications") {
           const res = await axios.get(
             `${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/applications`,
             { withCredentials: true }
           );
-          // backend returns { application: [...] }
           setApplications(res.data?.application || []);
         }
       } catch (err) {
-        console.error(err);
         toast.error(err.response?.data?.message || "Error loading data");
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
   }, [view]);
 
-  // -------- Actions ----------
+  /* ── Approve / block user ── */
   const handleUserStatus = async (userId, status) => {
     try {
       const res = await axios.put(
         `${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/users/${userId}/status`,
-        { status }, // "approved" | "blocked"
+        { status },
         { withCredentials: true }
       );
       toast.success(res.data?.message || "Status updated");
-
-      // refresh users list
       const updated = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/users`,
         { withCredentials: true }
       );
       setUsers(updated.data?.users || []);
     } catch (err) {
-      console.error(err);
       toast.error(err.response?.data?.message || "Update failed");
     }
   };
 
-  // -------- Client-side filtering for Users tab ----------
+  /* ── Client-side filter for users ── */
   const filteredUsers = useMemo(() => {
     let list = [...users];
-
     if (roleFilter !== "all") {
       list = list.filter(
         (u) => (u.role || "").toLowerCase() === roleFilter.toLowerCase()
       );
     }
-
     if (search.trim()) {
       const term = search.toLowerCase();
       list = list.filter(
@@ -127,233 +141,342 @@ const AdminDashboard = () => {
     return list;
   }, [users, roleFilter, search]);
 
-  return (
-    <div className="admin__wrap">
-      {/* Sidebar */}
-      <aside className="admin__sidebar">
-        <div className="sidebar__title">Admin</div>
-        <div className="sidebar__subtitle">Dashboard</div>
+  /* ── Tab counts ── */
+  const countFor = (tab) => {
+    if (tab === "users")        return users.length        || null;
+    if (tab === "jobs")         return jobs.length         || null;
+    if (tab === "applications") return applications.length || null;
+    return null;
+  };
 
-        <div className="sidebar__tabs">
+  /* ── Section title per view ── */
+  const sectionTitle = {
+    users:        "All Users",
+    jobs:         "All Jobs",
+    applications: "All Applications",
+  }[view];
+
+  /* ── Current row count ── */
+  const rowCount =
+    view === "users"        ? filteredUsers.length  :
+    view === "jobs"         ? jobs.length           :
+    applications.length;
+
+  return (
+    <div className="ad-wrap">
+
+      {/* ══════════ SIDEBAR ══════════ */}
+      <aside className="ad-sidebar">
+        <div className="ad-brand">
+          <p className="ad-brand-eyebrow">Control Panel</p>
+          <h1 className="ad-brand-name">Kazi<br />Haraka</h1>
+          <p className="ad-brand-sub">Admin Dashboard</p>
+        </div>
+
+        <div className="ad-sidebar-divider" />
+
+        <p className="ad-nav-label">Navigation</p>
+        <nav className="ad-nav">
           {TABS.map((t) => (
             <button
-              key={t}
-              className={`sidebar__tab ${view === t ? "active" : ""}`}
-              onClick={() => setView(t)}
+              key={t.key}
+              className={`ad-tab ${view === t.key ? "active" : ""}`}
+              onClick={() => setView(t.key)}
             >
-              {t.charAt(0).toUpperCase() + t.slice(1)}
+              <span className="ad-tab-icon">{t.icon}</span>
+              {t.label}
+              {countFor(t.key) !== null && (
+                <span className="ad-tab-count">{countFor(t.key)}</span>
+              )}
             </button>
           ))}
+        </nav>
+
+        <div className="ad-sidebar-footer">
+          Kazi Haraka Admin · {new Date().getFullYear()}
         </div>
       </aside>
 
-      {/* Main */}
-      <main className="admin__main">
-        {/* Stats */}
-        <section className="stats__grid">
-          <StatCard
-            label="Total Users"
-            value={stats?.totalUsers}
-            hint="All registered users"
-          />
-          <StatCard
-            label="Employers"
-            value={stats?.totalEmployers}
-            hint="Company accounts"
-          />
-          <StatCard
-            label="Job Seekers"
-            value={stats?.totalJobSeekers}
-            hint="Candidate accounts"
-          />
-          <StatCard
-            label="Jobs Posted"
-            value={stats?.totalJobs}
-            hint="Openings created"
-          />
-          <StatCard
-            label="Applications"
-            value={stats?.totalApplications}
-            hint="Submissions made"
-          />
+      {/* ══════════ MAIN ══════════ */}
+      <main className="ad-main">
+
+        {/* Page header */}
+        <div className="ad-page-header">
+          <div>
+            <p className="ad-page-eyebrow">Welcome back</p>
+            <h2 className="ad-page-title">Dashboard</h2>
+          </div>
+          <span className="ad-page-date">{today}</span>
+        </div>
+
+        {/* ── STAT CARDS ── */}
+        <section className="ad-stats">
+          <div className="ad-stat accent">
+            <div className="ad-stat-icon">👥</div>
+            <div className="ad-stat-value">{stats?.totalUsers ?? "—"}</div>
+            <div className="ad-stat-label">Total Users</div>
+            <div className="ad-stat-hint">All registered accounts</div>
+          </div>
+          <div className="ad-stat">
+            <div className="ad-stat-icon">🏢</div>
+            <div className="ad-stat-value">{stats?.totalEmployers ?? "—"}</div>
+            <div className="ad-stat-label">Employers</div>
+            <div className="ad-stat-hint">Company accounts</div>
+          </div>
+          <div className="ad-stat">
+            <div className="ad-stat-icon">🌸</div>
+            <div className="ad-stat-value">{stats?.totalJobSeekers ?? "—"}</div>
+            <div className="ad-stat-label">Job Seekers</div>
+            <div className="ad-stat-hint">Candidate accounts</div>
+          </div>
+          <div className="ad-stat">
+            <div className="ad-stat-icon">💼</div>
+            <div className="ad-stat-value">{stats?.totalJobs ?? "—"}</div>
+            <div className="ad-stat-label">Jobs Posted</div>
+            <div className="ad-stat-hint">Active openings</div>
+          </div>
+          <div className="ad-stat">
+            <div className="ad-stat-icon">📬</div>
+            <div className="ad-stat-value">{stats?.totalApplications ?? "—"}</div>
+            <div className="ad-stat-label">Applications</div>
+            <div className="ad-stat-hint">Total submissions</div>
+          </div>
         </section>
 
-        {/* Header + Tools */}
-        <div className="table__header">
-          <h2 className="table__title">
-            {view === "users" ? "Users" : view === "jobs" ? "Jobs" : "Applications"}
-          </h2>
+        {/* ── TABLE SECTION ── */}
+        <section className="ad-section">
 
-          {view === "users" && (
-            <div className="table__tools">
-              <input
-                className="input"
-                placeholder="Search name, email, role..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-              <select
-                className="select"
-                value={roleFilter}
-                onChange={(e) => setRoleFilter(e.target.value)}
-              >
-                <option value="all">All roles</option>
-                <option value="Employer">Employers</option>
-                <option value="Job Seeker">Job Seekers</option>
-              </select>
+          {/* Section head */}
+          <div className="ad-section-head">
+            <div>
+              <h3 className="ad-section-title">
+                {sectionTitle}
+                <span className="ad-section-count">
+                  {!loading ? `${rowCount} record${rowCount !== 1 ? "s" : ""}` : ""}
+                </span>
+              </h3>
             </div>
-          )}
-        </div>
 
-        {/* Tables */}
-        <div className="table__card">
-          {loading ? (
-            <div className="loading">Loading…</div>
-          ) : view === "users" ? (
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Phone</th>
-                  <th>Role</th>
-                  <th>Status</th>
-                  <th style={{ width: 220 }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredUsers.length ? (
-                  filteredUsers.map((u) => (
-                    <tr key={u._id}>
-                      <td>{u.name}</td>
-                      <td>{u.email}</td>
-                      <td>{u.phone || "-"}</td>
-                      <td>
-                        <Pill
-                          text={u.role}
-                          tone={
-                            u.role === "Employer"
-                              ? "info"
-                              : u.role === "Job Seeker"
-                              ? "success"
-                              : "neutral"
-                          }
-                        />
-                      </td>
-                      <td>
-                        <Pill
-                          text={u.status || "pending"}
-                          tone={
-                            u.status === "approved"
-                              ? "success"
-                              : u.status === "blocked"
-                              ? "danger"
-                              : "warn"
-                          }
-                        />
-                      </td>
-                      <td>
-                        <div className="actions">
-                          <button
-                            className="btn btn-approve"
-                            onClick={() => handleUserStatus(u._id, "approved")}
-                            disabled={u.status === "approved"}
-                          >
-                            Approve
-                          </button>
-                          <button
-                            className="btn btn-block"
-                            onClick={() => handleUserStatus(u._id, "blocked")}
-                            disabled={u.status === "blocked"}
-                          >
-                            Block
-                          </button>
-                        </div>
+            {/* Tools — only on users tab */}
+            {view === "users" && (
+              <div className="ad-tools">
+                <input
+                  className="ad-input"
+                  placeholder="Search name, email, role…"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+                <select
+                  className="ad-select"
+                  value={roleFilter}
+                  onChange={(e) => setRoleFilter(e.target.value)}
+                >
+                  <option value="all">All roles</option>
+                  <option value="Employer">Employers</option>
+                  <option value="Job Seeker">Job Seekers</option>
+                </select>
+              </div>
+            )}
+          </div>
+
+          {/* Table */}
+          <div className="ad-table-wrap">
+
+            {/* ── USERS ── */}
+            {view === "users" && (
+              <table className="ad-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {loading ? (
+                    <ShimmerRows cols={6} />
+                  ) : filteredUsers.length ? (
+                    filteredUsers.map((u) => (
+                      <tr key={u._id}>
+                        <td>
+                          <div className="ad-name-cell">
+                            <Avatar name={u.name} />
+                            <div>
+                              <div className="ad-name-text">{u.name}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <span className="ad-email-text">{u.email}</span>
+                        </td>
+                        <td>{u.phone || "—"}</td>
+                        <td>
+                          <Pill
+                            text={u.role}
+                            tone={
+                              u.role === "Employer"   ? "info"    :
+                              u.role === "Job Seeker" ? "rose"    : "neutral"
+                            }
+                          />
+                        </td>
+                        <td>
+                          <Pill
+                            text={u.status || "pending"}
+                            tone={
+                              u.status === "approved" ? "success" :
+                              u.status === "blocked"  ? "danger"  : "warn"
+                            }
+                          />
+                        </td>
+                        <td>
+                          <div className="ad-actions">
+                            <button
+                              className="ad-btn ad-btn-approve"
+                              onClick={() => handleUserStatus(u._id, "approved")}
+                              disabled={u.status === "approved"}
+                            >
+                              ✓ Approve
+                            </button>
+                            <button
+                              className="ad-btn ad-btn-block"
+                              onClick={() => handleUserStatus(u._id, "blocked")}
+                              disabled={u.status === "blocked"}
+                            >
+                              ✕ Block
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr className="ad-empty-row">
+                      <td colSpan={6}>
+                        <span className="ad-empty-icon">🌸</span>
+                        No users found
                       </td>
                     </tr>
-                  ))
-                ) : (
+                  )}
+                </tbody>
+              </table>
+            )}
+
+            {/* ── JOBS ── */}
+            {view === "jobs" && (
+              <table className="ad-table">
+                <thead>
                   <tr>
-                    <td colSpan="6" className="empty">
-                      No users found
-                    </td>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Location</th>
+                    <th>Posted By</th>
+                    <th>Status</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          ) : view === "jobs" ? (
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Title</th>
-                  <th>Category</th>
-                  <th>Location</th>
-                  <th>Posted By</th>
-                </tr>
-              </thead>
-              <tbody>
-                {jobs.length ? (
-                  jobs.map((j) => (
-                    <tr key={j._id}>
-                      <td>{j.title}</td>
-                      <td>{j.category || "-"}</td>
-                      <td>{j.location || "-"}</td>
-                      <td>{j.postedBy?.name || j.postedBy?.email || "-"}</td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="4" className="empty">
-                      No jobs found
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          ) : (
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Job</th>
-                  <th>Applicant</th>
-                  <th>Employer</th>
-                  <th>Status</th>
-                  <th>Payment</th>
-                </tr>
-              </thead>
-              <tbody>
-                {applications.length ? (
-                  applications.map((a) => (
-                    <tr key={a._id}>
-                      <td>{a.jobId?.title || "-"}</td>
-                      <td>{a.applicantID?.user?.name || "-"}</td>
-                      <td>{a.employerID?.user?.name || "-"}</td>
-                      <td>
-                        <Pill
-                          text={a.status || "pending"}
-                          tone={
-                            a.status === "accepted"
-                              ? "success"
-                              : a.status === "rejected"
-                              ? "danger"
-                              : "warn"
-                          }
-                        />
+                </thead>
+                <tbody>
+                  {loading ? (
+                    <ShimmerRows cols={5} />
+                  ) : jobs.length ? (
+                    jobs.map((j) => (
+                      <tr key={j._id}>
+                        <td><span style={{ fontWeight: 500 }}>{j.title}</span></td>
+                        <td>{j.category || "—"}</td>
+                        <td>{j.location || "—"}</td>
+                        <td>
+                          <div className="ad-name-cell">
+                            <Avatar name={j.postedBy?.name || "?"} />
+                            <span className="ad-name-text">
+                              {j.postedBy?.name || j.postedBy?.email || "—"}
+                            </span>
+                          </div>
+                        </td>
+                        <td>
+                          <Pill
+                            text={j.status || "active"}
+                            tone={j.status === "closed" ? "danger" : "success"}
+                          />
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr className="ad-empty-row">
+                      <td colSpan={5}>
+                        <span className="ad-empty-icon">💼</span>
+                        No jobs found
                       </td>
-                      <td>{a.payment || "Unpaid"}</td>
                     </tr>
-                  ))
-                ) : (
+                  )}
+                </tbody>
+              </table>
+            )}
+
+            {/* ── APPLICATIONS ── */}
+            {view === "applications" && (
+              <table className="ad-table">
+                <thead>
                   <tr>
-                    <td colSpan="5" className="empty">
-                      No applications found
-                    </td>
+                    <th>Job</th>
+                    <th>Applicant</th>
+                    <th>Employer</th>
+                    <th>Status</th>
+                    <th>Payment</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          )}
-        </div>
+                </thead>
+                <tbody>
+                  {loading ? (
+                    <ShimmerRows cols={5} />
+                  ) : applications.length ? (
+                    applications.map((a) => (
+                      <tr key={a._id}>
+                        <td>
+                          <span style={{ fontWeight: 500 }}>
+                            {a.jobId?.title || "—"}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="ad-name-cell">
+                            <Avatar name={a.applicantID?.user?.name || "?"} />
+                            <span className="ad-name-text">
+                              {a.applicantID?.user?.name || "—"}
+                            </span>
+                          </div>
+                        </td>
+                        <td>{a.employerID?.user?.name || "—"}</td>
+                        <td>
+                          <Pill
+                            text={a.status || "pending"}
+                            tone={
+                              a.status === "accepted" ? "success" :
+                              a.status === "rejected" ? "danger"  : "warn"
+                            }
+                          />
+                        </td>
+                        <td>
+                          <Pill
+                            text={a.paymentStatus || "unpaid"}
+                            tone={
+                              a.paymentStatus === "paid" ? "success" : "neutral"
+                            }
+                          />
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr className="ad-empty-row">
+                      <td colSpan={5}>
+                        <span className="ad-empty-icon">📋</span>
+                        No applications found
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            )}
+
+          </div>
+        </section>
       </main>
     </div>
   );
