@@ -3,12 +3,14 @@ import { Job } from "../models/jobSchema.js";
 import ErrorHandler from "../middlewares/error.js";
 
 export const getAllJobs = catchAsyncErrors(async (req, res, next) => {
-  const jobs = await Job.find({ expired: false }).populate("postedBy", "name email county");
-  res.status(200).json({
-    success: true,
-    jobs,
-  });
+  const jobs = await Job.find()
+    .populate("postedBy", "name email county")
+    .select("title category county location fixedSalary salaryFrom salaryTo expired jobPostedOn postedBy")
+    .lean();
+
+  res.status(200).json({ success: true, jobs });
 });
+
 
 
 export const postJob = catchAsyncErrors(async (req, res, next) => {

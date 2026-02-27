@@ -371,6 +371,7 @@ const AdminDashboard = () => {
                     <th>Title</th>
                     <th>Category</th>
                     <th>County</th>
+                    <th>Salary</th>
                     <th>Posted By</th>
                     <th>Status</th>
                   </tr>
@@ -385,6 +386,13 @@ const AdminDashboard = () => {
                         <td>{j.category || "—"}</td>
                         <td>{j.county || "—"}</td>
                         <td>
+                          {j.fixedSalary
+                            ? `KES ${j.fixedSalary.toLocaleString()}`
+                            : j.salaryFrom && j.salaryTo
+                            ? `KES ${j.salaryFrom.toLocaleString()} – ${j.salaryTo.toLocaleString()}`
+                            : "—"}
+                        </td>
+                        <td>
                           <div className="ad-name-cell">
                             <Avatar name={j.postedBy?.name || "?"} />
                             <span className="ad-name-text">
@@ -394,8 +402,8 @@ const AdminDashboard = () => {
                         </td>
                         <td>
                           <Pill
-                            text={j.status || "active"}
-                            tone={j.status === "closed" ? "danger" : "success"}
+                            text={j.expired ? "expired" : "active"}
+                            tone={j.expired ? "danger" : "success"}
                           />
                         </td>
                       </tr>
