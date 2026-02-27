@@ -370,7 +370,7 @@ const AdminDashboard = () => {
                   <tr>
                     <th>Title</th>
                     <th>Category</th>
-                    <th>Location</th>
+                    <th>County</th>
                     <th>Posted By</th>
                     <th>Status</th>
                   </tr>
@@ -383,7 +383,7 @@ const AdminDashboard = () => {
                       <tr key={j._id}>
                         <td><span style={{ fontWeight: 500 }}>{j.title}</span></td>
                         <td>{j.category || "—"}</td>
-                        <td>{j.location || "—"}</td>
+                        <td>{j.county || "—"}</td>
                         <td>
                           <div className="ad-name-cell">
                             <Avatar name={j.postedBy?.name || "?"} />
