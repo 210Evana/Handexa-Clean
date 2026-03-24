@@ -49,6 +49,9 @@ Handexa addresses these challenges by offering a centralized digital platform wh
 
 ## 📸 Screenshots
 
+### Admin Page
+![Admin](assets/admin.png)
+
 ### 🔐 Login Page
 ![Login](assets/login.png)
 
