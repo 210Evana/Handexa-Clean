@@ -121,6 +121,33 @@ const AdminDashboard = () => {
     }
   };
 
+  /* ── Grant / revoke premium ── */
+  const handlePremium = async (userId, action) => {
+    try {
+      if (action === "grant") {
+        const res = await axios.post(
+          `${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/users/${userId}/premium`,
+          { durationDays: 30 },
+          { withCredentials: true }
+        );
+        toast.success(res.data?.message || "Premium granted (30 days)");
+      } else {
+        const res = await axios.delete(
+          `${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/users/${userId}/premium`,
+          { withCredentials: true }
+        );
+        toast.success(res.data?.message || "Premium revoked");
+      }
+      const updated = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/v1/admin/users`,
+        { withCredentials: true }
+      );
+      setUsers(updated.data?.users || []);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed");
+    }
+  };
+
   /* ── Client-side filter for users ── */
   const filteredUsers = useMemo(() => {
     let list = [...users];
@@ -292,12 +319,13 @@ const AdminDashboard = () => {
                     <th>Phone</th>
                     <th>Role</th>
                     <th>Status</th>
+                    <th>Premium</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {loading ? (
-                    <ShimmerRows cols={6} />
+                    <ShimmerRows cols={7} />
                   ) : filteredUsers.length ? (
                     filteredUsers.map((u) => (
                       <tr key={u._id}>
@@ -332,6 +360,18 @@ const AdminDashboard = () => {
                           />
                         </td>
                         <td>
+                          {u.isPremium ? (
+                            <Pill text="Premium ✦" tone="success" />
+                          ) : (
+                            <Pill text="Free" tone="neutral" />
+                          )}
+                          {u.premiumExpiresAt && (
+                            <div style={{ fontSize: "0.7rem", opacity: 0.55, marginTop: 3 }}>
+                              Expires {new Date(u.premiumExpiresAt).toLocaleDateString("en-GB")}
+                            </div>
+                          )}
+                        </td>
+                        <td>
                           <div className="ad-actions">
                             <button
                               className="ad-btn ad-btn-approve"
@@ -347,6 +387,25 @@ const AdminDashboard = () => {
                             >
                               ✕ Block
                             </button>
+                            {u.role !== "Admin" && (
+                              u.isPremium ? (
+                                <button
+                                  className="ad-btn ad-btn-block"
+                                  onClick={() => handlePremium(u._id, "revoke")}
+                                  style={{ background: "#fef6e7", color: "#7a4800", border: "1px solid #f5d8a0" }}
+                                >
+                                  ✕ Premium
+                                </button>
+                              ) : (
+                                <button
+                                  className="ad-btn ad-btn-approve"
+                                  onClick={() => handlePremium(u._id, "grant")}
+                                  style={{ background: "#f3eef2", color: "#5c2e58", border: "1px solid #d4b8d0" }}
+                                >
+                                  ✦ Premium
+                                </button>
+                              )
+                            )}
                           </div>
                         </td>
                       </tr>
