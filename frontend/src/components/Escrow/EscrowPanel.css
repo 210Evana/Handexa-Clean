@@ -1,0 +1,372 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&family=Outfit:wght@300;400;500;600&display=swap');
+
+/* ═══════════════════════════════════════
+   ESCROW PANEL — role-adaptive
+═══════════════════════════════════════ */
+
+/* ── EMPLOYER tokens ── */
+.escrow.employer {
+  --accent:        #a3e635;
+  --accent-dim:    rgba(163,230,53,0.1);
+  --accent-border: rgba(163,230,53,0.25);
+  --accent-text:   #0a0f1e;
+  --bg:            #0a0f1e;
+  --surface:       #111827;
+  --surface-2:     #0d1424;
+  --border:        rgba(255,255,255,0.07);
+  --text-primary:  #fff;
+  --text-secondary:#e8eaf2;
+  --text-muted:    #6b7280;
+  --font-body:     'DM Sans', sans-serif;
+  --font-display:  'Bebas Neue', sans-serif;
+  --danger:        #f87171;
+  --warning:       #fbbf24;
+  --success:       #34d399;
+}
+
+/* ── SEEKER tokens ── */
+.escrow.seeker {
+  --accent:        #e07b4f;
+  --accent-dim:    rgba(224,123,79,0.08);
+  --accent-border: rgba(224,123,79,0.25);
+  --accent-text:   #fff;
+  --bg:            #faf7f2;
+  --surface:       #fff;
+  --surface-2:     #f5f0ea;
+  --border:        #e8e0d4;
+  --text-primary:  #1a1410;
+  --text-secondary:#3d3530;
+  --text-muted:    #9b8e83;
+  --font-body:     'Outfit', sans-serif;
+  --font-display:  'Playfair Display', serif;
+  --danger:        #e05353;
+  --warning:       #d97706;
+  --success:       #16a34a;
+}
+
+/* ── ADMIN tokens ── */
+.escrow.admin {
+  --accent:        #3d1f3a;
+  --accent-dim:    rgba(61,31,58,0.08);
+  --accent-border: rgba(61,31,58,0.2);
+  --accent-text:   #fff;
+  --bg:            #fdfaf8;
+  --surface:       #fff;
+  --surface-2:     #faf7f2;
+  --border:        #ede6e3;
+  --text-primary:  #2a1628;
+  --text-secondary:#6b4e69;
+  --text-muted:    #a88ba6;
+  --font-body:     'DM Sans', sans-serif;
+  --font-display:  'Cormorant Garamond', serif;
+  --danger:        #dc2626;
+  --warning:       #d97706;
+  --success:       #16a34a;
+}
+
+/* ═══════════════════════════════════════
+   SHARED BASE
+═══════════════════════════════════════ */
+.escrow {
+  font-family: var(--font-body);
+  color: var(--text-secondary);
+}
+
+/* ── CARD ── */
+.escrow-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  margin-top: 16px;
+}
+.escrow.employer .escrow-card { box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+.escrow.seeker  .escrow-card  { box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+
+.escrow-card-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.escrow.employer .escrow-card-title { font-size: 1.4rem; letter-spacing: 0.03em; }
+
+/* ── STATUS BADGE ── */
+.escrow-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  white-space: nowrap;
+}
+.escrow-status::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.7;
+}
+.escrow-status.none         { background: rgba(107,114,128,0.1); color: #6b7280; }
+.escrow-status.pending      { background: rgba(251,191,36,0.12); color: #d97706; }
+.escrow-status.paid         { background: rgba(52,211,153,0.1);  color: #059669; }
+.escrow-status.in_progress  { background: rgba(59,130,246,0.1);  color: #2563eb; }
+.escrow-status.work_submitted { background: rgba(139,92,246,0.1); color: #7c3aed; }
+.escrow-status.completed    { background: rgba(52,211,153,0.1);  color: #059669; }
+.escrow-status.released     { background: rgba(52,211,153,0.15); color: #047857; }
+.escrow-status.disputed     { background: rgba(248,113,113,0.12);color: #dc2626; }
+.escrow-status.refunded     { background: rgba(251,191,36,0.12); color: #b45309; }
+
+/* ── AMOUNT DISPLAY ── */
+.escrow-amount-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+.escrow-amount-box {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.escrow-amount-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+.escrow-amount-value {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.escrow.employer .escrow-amount-value { font-size: 1.7rem; }
+.escrow-amount-value.accent { color: var(--accent); }
+
+/* ── MPESA INSTRUCTIONS BOX ── */
+.escrow-mpesa-box {
+  background: var(--accent-dim);
+  border: 1.5px dashed var(--accent-border);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin: 16px 0;
+}
+.escrow-mpesa-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.escrow-mpesa-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+.escrow-mpesa-num {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-text);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.escrow-mpesa-highlight {
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 1rem;
+}
+
+/* ── INPUT ── */
+.escrow-input {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--surface-2);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  outline: none;
+  margin-bottom: 12px;
+  transition: border-color 0.2s;
+}
+.escrow-input:focus { border-color: var(--accent); }
+.escrow-input::placeholder { color: var(--text-muted); }
+
+/* ── BUTTONS ── */
+.escrow-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 20px;
+  border: none;
+  border-radius: 10px;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+.escrow-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.escrow-btn:active:not(:disabled) { transform: scale(0.98); }
+
+.escrow-btn-primary {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+.escrow-btn-primary:hover:not(:disabled) { filter: brightness(1.08); }
+
+.escrow-btn-danger {
+  background: rgba(220,38,38,0.1);
+  color: #dc2626;
+  border: 1px solid rgba(220,38,38,0.2);
+}
+.escrow-btn-danger:hover:not(:disabled) { background: rgba(220,38,38,0.18); }
+
+.escrow-btn-ghost {
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+.escrow-btn-ghost:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+
+.escrow-btn-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+/* ── TIMELINE ── */
+.escrow-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 16px 0;
+}
+.escrow-timeline-step {
+  display: flex;
+  gap: 14px;
+  position: relative;
+}
+.escrow-timeline-step:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 11px; top: 26px;
+  width: 2px;
+  height: calc(100% + 2px);
+  background: var(--border);
+}
+.escrow-timeline-dot {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  margin-top: 2px;
+  z-index: 1;
+}
+.escrow-timeline-dot.done    { background: var(--success); color: #fff; }
+.escrow-timeline-dot.active  { background: var(--accent); color: var(--accent-text); }
+.escrow-timeline-dot.waiting { background: var(--surface-2); border: 2px solid var(--border); color: var(--text-muted); }
+.escrow-timeline-content { padding-bottom: 18px; }
+.escrow-timeline-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.escrow-timeline-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ── DISPUTE FORM ── */
+.escrow-dispute-textarea {
+  width: 100%;
+  min-height: 90px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--surface-2);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  outline: none;
+  resize: vertical;
+  margin-bottom: 10px;
+  transition: border-color 0.2s;
+}
+.escrow-dispute-textarea:focus { border-color: var(--danger); }
+
+/* ── ADMIN TABLE ── */
+.escrow-admin-table-wrap { overflow-x: auto; }
+.escrow-admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.escrow-admin-table th {
+  text-align: left;
+  padding: 11px 14px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.escrow-admin-table td {
+  padding: 13px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.escrow-admin-table tr:hover td { background: var(--surface-2); }
+
+/* ── INFO ROW ── */
+.escrow-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.875rem;
+}
+.escrow-info-row:last-child { border-bottom: none; }
+.escrow-info-key   { color: var(--text-muted); font-size: 0.8rem; }
+.escrow-info-value { font-weight: 600; color: var(--text-primary); }
+
+/* ── ALERT BOX ── */
+.escrow-alert {
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+.escrow-alert.info    { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); color: #2563eb; }
+.escrow-alert.warning { background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.25); color: #92400e; }
+.escrow-alert.success { background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.2); color: #065f46; }
+.escrow-alert.danger  { background: rgba(220,38,38,0.07);  border: 1px solid rgba(220,38,38,0.18); color: #991b1b; }

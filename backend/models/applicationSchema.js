@@ -1,39 +1,15 @@
 import mongoose from "mongoose";
-import validator from "validator";
 
 const applicationSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, "Please enter your Name!"],
-    minLength: [3, "Name must contain at least 3 Characters!"],
-    maxLength: [30, "Name cannot exceed 30 Characters!"],
+  jobId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Job",
+    required: true,
   },
-  email: {
-    type: String,
-    required: [true, "Please enter your Email!"],
-    validate: [validator.isEmail, "Please provide a valid Email!"],
-  },
-  coverLetter: {
-    type: String,
-    required: [true, "Please provide a cover letter!"],
-  },
-  phone: {
-    type: Number,
-    required: [true, "Please enter your Phone Number!"],
-  },
-  address: {
-    type: String,
-    required: [true, "Please enter your Address!"],
-  },
-  resume: {
-    public_id: {
-      type: String, 
-      required: false,
-    },
-    url: {
-      type: String, 
-      required: false,
-    },
+  jobInfo: {
+    jobTitle: String,
+    jobCounty: String,
+    jobCategory: String,
   },
   applicantID: {
     user: {
@@ -41,11 +17,15 @@ const applicationSchema = new mongoose.Schema({
       ref: "User",
       required: true,
     },
-    role: {
-      type: String,
-      enum: ["Job Seeker"],
-      required: true,
+    name: String,
+    email: String,
+    phone: Number,
+    address: String,
+    resume: {
+      public_id: String,
+      url: String,
     },
+    coverLetter: String,
   },
   employerID: {
     user: {
@@ -53,29 +33,50 @@ const applicationSchema = new mongoose.Schema({
       ref: "User",
       required: true,
     },
-    role: {
-      type: String,
-      enum: ["Employer"],
-      required: true,
-    },
+    name: String,
+    email: String,
+    phone: Number,
+    address: String,
   },
-   jobId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Job",
-      required: true,
-    },
+
+  // ── Application status ──────────────────────────────────────
   status: {
     type: String,
-    enum: ["pending", "accepted", "rejected"],
-    default: "pending",
+    enum: ["Pending", "Accepted", "Rejected"],
+    default: "Pending",
   },
-  payment:{
-      type: String,
-      enum: ["Paid", "Unpaid"],
-      default: "Unpaid",
-    },
+
+  // ── Escrow/payment status ───────────────────────────────────
+  // Mirrors the escrow record status for quick UI queries
+  // without having to join the Escrow collection every time.
+  escrowStatus: {
+    type: String,
+    enum: [
+      "none",           // no escrow created yet
+      "pending",        // employer shown payment instructions
+      "paid",           // admin confirmed payment
+      "in_progress",    // work underway
+      "work_submitted", // seeker marked work done
+      "completed",      // employer confirmed completion
+      "released",       // funds released to seeker
+      "disputed",       // dispute filed
+      "refunded",       // employer refunded
+    ],
+    default: "none",
   },
-  { timestamps: true }
-);
+
+  // ── Agreed amount (set during chat/negotiation) ─────────────
+  // Employer enters this when initiating payment
+  agreedAmount: {
+    type: Number,
+    default: null,
+  },
+
+  deletedBy: {
+    type: String,
+    enum: ["employer", "jobSeeker", null],
+    default: null,
+  },
+}, { timestamps: true });
 
 export const Application = mongoose.model("Application", applicationSchema);

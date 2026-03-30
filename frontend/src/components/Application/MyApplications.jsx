@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { FaComment, FaTrash, FaImage, FaTimes } from "react-icons/fa";
 import "./MyApplications.css";
+import EscrowPanel from "../Escrow/EscrowPanel";
 
 /* ─── RESUME MODAL ─── */
 const ResumeModal = ({ imageUrl, onClose }) => (
@@ -79,13 +80,23 @@ const JobSeekerCard = ({ element, deleteApplication, openModal, navigateTo }) =>
 
     <div className="ma-card-foot">
       <div className="ma-actions">
-        <button className="ma-btn ma-btn-msg" onClick={() => navigateTo(`/message/${element._id}`)}>
+        <button className="ma-btn ma-btn-msg"
+          onClick={() => navigateTo(`/message/${element._id}`)}>
           <FaComment /> Message
         </button>
-        <button className="ma-btn ma-btn-del" onClick={() => deleteApplication(element._id)}>
+        <button className="ma-btn ma-btn-del"
+          onClick={() => deleteApplication(element._id)}>
           <FaTrash /> Withdraw
         </button>
       </div>
+    </div>
+
+    {/* ── ESCROW PANEL — shows payment status & dispute option ── */}
+    <div style={{ padding: "0 16px 16px" }}>
+      <EscrowPanel
+        applicationId={element._id}
+        applicationStatus={element.status}
+      />
     </div>
   </div>
 );
@@ -155,10 +166,19 @@ const EmployerCard = ({ element, openModal, handleStatusChange, navigateTo }) =>
         <option value="rejected">Reject Applicant</option>
       </select>
       <div className="ma-actions">
-        <button className="ma-btn ma-btn-msg" onClick={() => navigateTo(`/message/${element._id}`)}>
+        <button className="ma-btn ma-btn-msg"
+          onClick={() => navigateTo(`/message/${element._id}`)}>
           <FaComment /> Message
         </button>
       </div>
+    </div>
+
+    {/* ── ESCROW PANEL — shown after accepting, lets employer initiate payment ── */}
+    <div style={{ padding: "0 16px 16px" }}>
+      <EscrowPanel
+        applicationId={element._id}
+        applicationStatus={element.status}
+      />
     </div>
   </div>
 );
@@ -180,8 +200,14 @@ const MyApplications = () => {
       : `${import.meta.env.VITE_BACKEND_URL}/api/v1/application/jobseeker/getall`;
 
     axios.get(endpoint, { withCredentials: true })
-      .then(({ data }) => { setApplications(data.applications || []); setLoading(false); })
-      .catch(err => { toast.error(err.response?.data?.message || "Failed to load applications"); setLoading(false); });
+      .then(({ data }) => {
+        setApplications(data.applications || []);
+        setLoading(false);
+      })
+      .catch(err => {
+        toast.error(err.response?.data?.message || "Failed to load applications");
+        setLoading(false);
+      });
   }, [isAuthorized, user]);
 
   if (!isAuthorized) { navigateTo("/"); return null; }
@@ -202,7 +228,9 @@ const MyApplications = () => {
 
   const handleStatusChange = async (appId, newStatus) => {
     const backup = [...applications];
-    setApplications(prev => prev.map(a => a._id === appId ? { ...a, status: newStatus } : a));
+    setApplications(prev =>
+      prev.map(a => a._id === appId ? { ...a, status: newStatus } : a)
+    );
     try {
       const { data } = await axios.put(
         `${import.meta.env.VITE_BACKEND_URL}/api/v1/application/status/${appId}`,
@@ -218,6 +246,7 @@ const MyApplications = () => {
 
   return (
     <div className={`ma-root ${isEmployer ? "employer" : "seeker"}`}>
+
       {/* HEADER */}
       <div className="ma-header">
         <div className="ma-header-inner">
@@ -237,7 +266,8 @@ const MyApplications = () => {
       <div className="ma-body">
         {!loading && (
           <p className="ma-count">
-            <strong>{applications.length}</strong> application{applications.length !== 1 ? "s" : ""}
+            <strong>{applications.length}</strong>{" "}
+            application{applications.length !== 1 ? "s" : ""}
           </p>
         )}
 
@@ -246,31 +276,41 @@ const MyApplications = () => {
             Array(3).fill(0).map((_, i) => <div className="ma-skeleton" key={i} />)
           ) : applications.length === 0 ? (
             <div className="ma-empty">
-              <p>{isEmployer ? "No applications received yet." : "You haven't applied to any jobs yet."}</p>
+              <p>
+                {isEmployer
+                  ? "No applications received yet."
+                  : "You haven't applied to any jobs yet."}
+              </p>
             </div>
-          ) : applications.map((app, i) =>
-            isEmployer ? (
-              app._id && (
-                <EmployerCard key={app._id}
+          ) : (
+            applications.map((app, i) =>
+              isEmployer ? (
+                app._id && (
+                  <EmployerCard
+                    key={app._id}
+                    element={app}
+                    openModal={setModalUrl}
+                    handleStatusChange={handleStatusChange}
+                    navigateTo={navigateTo}
+                  />
+                )
+              ) : (
+                <JobSeekerCard
+                  key={app._id || `app-${i}`}
                   element={app}
+                  deleteApplication={deleteApplication}
                   openModal={setModalUrl}
-                  handleStatusChange={handleStatusChange}
                   navigateTo={navigateTo}
                 />
               )
-            ) : (
-              <JobSeekerCard key={app._id || `app-${i}`}
-                element={app}
-                deleteApplication={deleteApplication}
-                openModal={setModalUrl}
-                navigateTo={navigateTo}
-              />
             )
           )}
         </div>
       </div>
 
-      {modalUrl && <ResumeModal imageUrl={modalUrl} onClose={() => setModalUrl(null)} />}
+      {modalUrl && (
+        <ResumeModal imageUrl={modalUrl} onClose={() => setModalUrl(null)} />
+      )}
     </div>
   );
 };

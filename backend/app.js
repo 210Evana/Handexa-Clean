@@ -10,6 +10,7 @@ import cors from "cors";
 import { errorMiddleware } from "./middlewares/error.js";
 import cookieParser from "cookie-parser";
 import fileUpload from "express-fileupload";
+import escrowRouter from "./routes/escrowRoutes.js";
 
 const app = express();
 config({ path: "./config.env" });
@@ -39,6 +40,7 @@ app.use("/api/v1/job", jobRouter);
 app.use("/api/v1/application", applicationRouter);
 app.use("/api/v1/message",MessageRouter);
 app.use("/api/v1/admin", AdminRouter);
+app.use("/api/v1/escrow", escrowRouter);
 
 // Database connection
 dbConnection();
