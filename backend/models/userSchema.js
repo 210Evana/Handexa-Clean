@@ -10,62 +10,106 @@ const userSchema = new mongoose.Schema({
     minLength: [3, "Name must contain at least 3 Characters!"],
     maxLength: [30, "Name cannot exceed 30 Characters!"],
   },
-
-  phone: {
-  type: String, // <- changed from Number
-  required: [true, "Please enter your Phone Number!"],
-  unique: true, // <- optional
-  },
-
   email: {
-  type: String,
-  required: [true, "Please enter your Email!"],
-  validate: [validator.isEmail, "Please provide a valid Email!"],
-  unique: true, // <- important!
- },
-
-  password: {
     type: String,
-    required: [true, "Please provide a Password!"],
-    minLength: [8, "Password must contain at least 8 characters!"],
-    maxLength: [32, "Password cannot exceed 32 characters!"],
-    select: false,
+    required: [true, "Please enter your Email!"],
+    validate: [validator.isEmail, "Please provide a valid Email!"],
+  },
+  phone: {
+    type: Number,
+    required: [true, "Please enter your Phone Number!"],
+  },
+  address: {
+    type: String,
+    required: [true, "Please enter your Address!"],
+  },
+  niches: {
+    firstNiche:  { type: String },
+    secondNiche: { type: String },
+    thirdNiche:  { type: String },
+  },
+  resume: {
+    public_id: String,
+    url:       String,
+  },
+  coverLetter: {
+    type: String,
   },
   role: {
     type: String,
-    required: [true, "Please select a role"],
-    enum: ["Job Seeker", "Employer" ,"Admin"],
+    enum:     ["Job Seeker", "Employer", "Admin"],
+    required: [true, "Please select a role!"],
+  },
+  status: {
+    type:    String,
+    enum:    ["pending", "approved", "blocked"],
+    default: "pending",
   },
 
+  // ── PREMIUM ────────────────────────────────────────────────────────────────
+  // Both Job Seekers and Employers need premium for:
+  //   - In-app chat
+  //   - Viewing contact info (phone / email) on jobs/profiles
+  // Admin always bypasses these checks.
+  isPremium: {
+    type:    Boolean,
+    default: false,
+  },
+  premiumExpiresAt: {
+    type:    Date,
+    default: null,
+    // null = no expiry set (used when admin grants lifetime premium)
+  },
+  premiumGrantedBy: {
+    // "admin" | "payment" — useful for audit trail
+    type:    String,
+    enum:    ["admin", "payment", null],
+    default: null,
+  },
+  premiumGrantedAt: {
+    type:    Date,
+    default: null,
+  },
+  // ──────────────────────────────────────────────────────────────────────────
+
+  password: {
+    type:     String,
+    required: [true, "Please enter your Password!"],
+    minLength: [8, "Password must contain at least 8 characters!"],
+    select:   false,
+  },
   createdAt: {
-    type: Date,
+    type:    Date,
     default: Date.now,
   },
-  avatar: {
-    public_id: String,
-    url: String,
-  }
-
 });
 
+// ── Auto-expire premium on fetch ────────────────────────────────────────────
+// If premiumExpiresAt has passed, treat the user as free.
+// This virtual lets you call user.isActivePremium anywhere.
+userSchema.virtual("isActivePremium").get(function () {
+  if (this.role === "Admin") return true;           // Admin always premium
+  if (!this.isPremium) return false;
+  if (!this.premiumExpiresAt) return true;          // No expiry = lifetime
+  return this.premiumExpiresAt > new Date();
+});
 
-//ENCRYPTING THE PASSWORD WHEN THE USER REGISTERS OR MODIFIES HIS PASSWORD
+// ── Hash password before save ───────────────────────────────────────────────
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) {
-    next();
-  }
+  if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
+  next();
 });
 
-//COMPARING THE USER PASSWORD ENTERED BY USER WITH THE USER SAVED PASSWORD
+// ── Compare password ────────────────────────────────────────────────────────
 userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-//GENERATING A JWT TOKEN WHEN A USER REGISTERS OR LOGINS, IT DEPENDS ON OUR CODE THAT WHEN DO WE NEED TO GENERATE THE JWT TOKEN WHEN THE USER LOGIN OR REGISTER OR FOR BOTH. 
+// ── Generate JWT ────────────────────────────────────────────────────────────
 userSchema.methods.getJWTToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET_KEY, {
-    expiresIn: process.env.JWT_EXPIRE ,
+    expiresIn: process.env.JWT_EXPIRE,
   });
 };
 

@@ -1,5 +1,6 @@
 import express from "express";
 import { isAuthorized } from "../middlewares/auth.js";
+import { checkPremium } from "../middlewares/checkPremium.js";
 import {
   sendMessage,
   getMessagesByApplication,
@@ -8,14 +9,9 @@ import {
 
 const router = express.Router();
 
-// Send a new message
-router.post("/send", isAuthorized, sendMessage);
-
-// Get all messages for an application
-router.get("/:applicationId", isAuthorized, getMessagesByApplication);
-
-// Mark all messages in an application as read
-// Called by the frontend when the chat window is opened or focused
-router.put("/read/:applicationId", isAuthorized, markMessagesRead);
+// All message routes require login AND premium
+router.post("/send",                   isAuthorized, checkPremium, sendMessage);
+router.get("/:applicationId",          isAuthorized, checkPremium, getMessagesByApplication);
+router.put("/read/:applicationId",     isAuthorized, checkPremium, markMessagesRead);
 
 export default router;
