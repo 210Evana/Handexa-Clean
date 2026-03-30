@@ -14,7 +14,7 @@ import JobDetails from "./components/Job/JobDetails";
 import Application from "./components/Application/Application";
 import MyApplications from "./components/Application/MyApplications";
 import PostJob from "./components/Job/PostJob";
-//import NotFound from "./components/NotFound/NotFound";
+import NotFound from "./components/NotFound/NotFound";
 import MyJobs from "./components/Job/MyJobs";
 import MessagePage from "./components/Messages/MessagePage";
 import AdminDashboard from "./components/Admin/AdminDashboard";
