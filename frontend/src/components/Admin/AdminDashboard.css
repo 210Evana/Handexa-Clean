@@ -544,3 +544,18 @@
   .ad-tools { width: 100%; }
   .ad-input, .ad-select { min-width: unset; width: 100%; }
 }
+
+/* ── Premium badge in users table ── */
+.ad-btn-premium-grant {
+  background: #f3eef2;
+  color: #5c2e58;
+  border: 1px solid #d4b8d0;
+}
+.ad-btn-premium-grant:hover:not(:disabled) { background: #e8d8e5; }
+
+.ad-btn-premium-revoke {
+  background: #fef6e7;
+  color: #7a4800;
+  border: 1px solid #f5d8a0;
+}
+.ad-btn-premium-revoke:hover:not(:disabled) { background: #fdecc8; }
