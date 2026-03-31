@@ -18,11 +18,14 @@ const ResumeModal = ({ imageUrl, onClose }) => (
 );
 
 /* ─── STATUS BADGE ─── */
-const StatusBadge = ({ status }) => (
-  <span className={`ma-badge ${status || "pending"}`}>
-    {status || "Pending"}
-  </span>
-);
+const StatusBadge = ({ status }) => {
+  const s = (status || "pending").toLowerCase();
+  return (
+    <span className={`ma-badge ${s}`}>
+      {status || "Pending"}
+    </span>
+  );
+};
 
 /* ─── JOB SEEKER CARD ─── */
 const JobSeekerCard = ({ element, deleteApplication, openModal, navigateTo }) => (
@@ -158,12 +161,12 @@ const EmployerCard = ({ element, openModal, handleStatusChange, navigateTo }) =>
     <div className="ma-card-foot">
       <select
         className="ma-status-select"
-        value={element.status || "pending"}
+        value={(element.status || "Pending").toLowerCase()}
         onChange={e => handleStatusChange(element._id, e.target.value)}
       >
-        <option value="pending">Pending</option>
-        <option value="accepted">Accept Applicant</option>
-        <option value="rejected">Reject Applicant</option>
+        <option value="Pending">Pending</option>
+        <option value="Accepted">Accept Applicant</option>
+        <option value="Rejected">Reject Applicant</option>
       </select>
       <div className="ma-actions">
         <button className="ma-btn ma-btn-msg"

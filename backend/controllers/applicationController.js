@@ -71,7 +71,7 @@ export const jobseekerGetAllApplications = catchAsyncErrors(async (req, res, nex
   }
 
   const applications = await Application.find({ "applicantID.user": req.user._id })
-    .populate({ path: "jobId", select: "title company location" })
+    .populate({ path: "jobId", select: "title company location county" })
     .populate({ path: "applicantID.user", select: "name email phone" })
     .populate({ path: "employerID.user", select: "name email" });
 
@@ -137,7 +137,11 @@ export const updateApplicationStatus = catchAsyncErrors(async (req, res, next) =
     return next(new ErrorHandler("Status is required", 400));
   }
 
-  if (!["pending", "accepted", "rejected"].includes(status)) {
+  // ── Capitalise first letter to match schema enum: "Pending" | "Accepted" | "Rejected"
+  const normalise = (s) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+  const normalisedStatus = normalise(status);
+
+  if (!["Pending", "Accepted", "Rejected"].includes(normalisedStatus)) {
     return next(new ErrorHandler("Invalid status value", 400));
   }
 
@@ -150,23 +154,20 @@ export const updateApplicationStatus = catchAsyncErrors(async (req, res, next) =
     return next(new ErrorHandler("Not authorized to update this application", 403));
   }
 
-  if (application.status === status) {
+  if (application.status === normalisedStatus) {
     return res.status(200).json({
       success: true,
-      message: `Application already has status '${status}'`,
+      message: `Application already has status '${normalisedStatus}'`,
       application,
     });
   }
 
-  application.status = status;
+  application.status = normalisedStatus;
   await application.save();
-
-  const paymentInitiated = status === "accepted";
 
   res.status(200).json({
     success: true,
-    message: `Application status updated${paymentInitiated ? " and payment initiated" : ""}`,
-    paymentInitiated,
+    message: `Application status updated to ${normalisedStatus}`,
     application,
   });
 });
@@ -176,7 +177,7 @@ export const getApplicationById = catchAsyncErrors(async (req, res, next) => {
   const { applicationId } = req.params;
 
   const application = await Application.findById(applicationId)
-    .populate({ path: "jobId", select: "title coounty location" })
+    .populate({ path: "jobId", select: "title county location" })
     .populate({ path: "applicantID.user", select: "name email role" })
     .populate({ path: "employerID.user", select: "name email role" });
 
