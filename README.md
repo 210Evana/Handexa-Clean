@@ -70,6 +70,12 @@ Handexa addresses these challenges by offering a centralized digital platform wh
 ### 📊 Post Job Page
 ![Job](assets/postjob.png)
 
+### 📊 Employer initiate Payment
+![Payment](assets/payment.png)
+
+### 📊 JobSeeker waits for confirmation
+![Payment](assets/payment_jobseeker.png)
+
 ## 🔐 Core Features
 
 ### 👤 Role-Based Authentication
