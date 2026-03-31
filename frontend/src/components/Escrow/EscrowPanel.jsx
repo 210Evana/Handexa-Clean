@@ -201,7 +201,7 @@ const EscrowPanel = ({ applicationId, applicationStatus }) => {
                 </div>
               </div>
               <div className="escrow-amount-box">
-                <div className="escrow-amount-label">Platform Fee (10%)</div>
+                <div className="escrow-amount-label">Platform Fee (5%)</div>
                 <div className="escrow-amount-value">
                   KES {escrow.platformFee?.toLocaleString()}
                 </div>

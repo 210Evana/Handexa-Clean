@@ -32,10 +32,10 @@ const escrowSchema = new mongoose.Schema(
     },
     platformFeePercent: {
       type: Number,
-      default: 10, // 10% platform cut
+      default: 5, // 5% platform cut
     },
     platformFee: {
-      type: Number, // calculated: agreedAmount * 0.10
+      type: Number, // calculated: agreedAmount * 0.05
     },
     seekerPayout: {
       type: Number, // calculated: agreedAmount - platformFee

@@ -11,6 +11,7 @@ import { errorMiddleware } from "./middlewares/error.js";
 import cookieParser from "cookie-parser";
 import fileUpload from "express-fileupload";
 import escrowRouter from "./routes/escrowRoutes.js";
+import helmet from "helmet";
 
 const app = express();
 config({ path: "./config.env" });
@@ -18,12 +19,13 @@ config({ path: "./config.env" });
 // Middleware setup
 app.use(
   cors({
-    origin: "https://handexa.vercel.app",
+    origin: [process.env.FRONTEND_URL],
     methods: ["GET", "POST", "DELETE", "PUT"],
     credentials: true,//allow cookies to be sent
   })
 );
 
+app.use(helmet());
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -31,7 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   fileUpload({
     useTempFiles: true,
-    tempFileDir: "/tmp/",
+    tempFileDir: "./tmp/",
   })
 );
 // Route setup
