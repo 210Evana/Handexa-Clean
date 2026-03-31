@@ -11,7 +11,7 @@ import { errorMiddleware } from "./middlewares/error.js";
 import cookieParser from "cookie-parser";
 import fileUpload from "express-fileupload";
 import escrowRouter from "./routes/escrowRoutes.js";
-import helmet from "helmet";
+//import helmet from "helmet";
 
 const app = express();
 config({ path: "./config.env" });
@@ -25,7 +25,7 @@ app.use(
   })
 );
 
-app.use(helmet());
+//app.use(helmet());
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

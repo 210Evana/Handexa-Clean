@@ -135,8 +135,8 @@ const EscrowPanel = ({ applicationId, applicationStatus }) => {
 
   if (loading) return null;
 
-  /* ── Don't show for pending/rejected applications ── */
-  if (applicationStatus !== "Accepted" && !escrow) return null;
+  /* ── Only show escrow for Accepted applications ── */
+  if (applicationStatus !== "Accepted") return null;
 
   const status = escrow?.status || "none";
 
@@ -201,7 +201,7 @@ const EscrowPanel = ({ applicationId, applicationStatus }) => {
                 </div>
               </div>
               <div className="escrow-amount-box">
-                <div className="escrow-amount-label">Platform Fee (5%)</div>
+                <div className="escrow-amount-label">Platform Fee (10%)</div>
                 <div className="escrow-amount-value">
                   KES {escrow.platformFee?.toLocaleString()}
                 </div>
