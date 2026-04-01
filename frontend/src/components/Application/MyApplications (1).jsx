@@ -204,7 +204,9 @@ const MyApplications = () => {
 
     axios.get(endpoint, { withCredentials: true })
       .then(({ data }) => {
-        setApplications(data.applications || []);
+        // Filter out applications where the job was deleted (jobId is null)
+        const valid = (data.applications || []).filter(a => a.jobId !== null && a.jobId !== undefined);
+        setApplications(valid);
         setLoading(false);
       })
       .catch(err => {

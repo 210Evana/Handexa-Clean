@@ -1,17 +1,16 @@
 import { catchAsyncErrors } from "../middlewares/catchAsyncError.js";
 import { Job } from "../models/jobSchema.js";
+import { Application } from "../models/applicationSchema.js";
+import { Escrow } from "../models/escrowSchema.js";
 import ErrorHandler from "../middlewares/error.js";
 
 export const getAllJobs = catchAsyncErrors(async (req, res, next) => {
-  const jobs = await Job.find()
-    .populate("postedBy", "name email")
-    .select("title category county fixedSalary salaryFrom salaryTo expired postedBy")
-    .lean();
-
-  res.status(200).json({ success: true, jobs });
+  const jobs = await Job.find({ expired: false }).populate("postedBy", "name email county");
+  res.status(200).json({
+    success: true,
+    jobs,
+  });
 });
-
-
 
 export const postJob = catchAsyncErrors(async (req, res, next) => {
   const { role } = req.user;
@@ -49,6 +48,7 @@ export const postJob = catchAsyncErrors(async (req, res, next) => {
       new ErrorHandler("Cannot Enter Fixed and Ranged Salary together.", 400)
     );
   }
+
   const postedBy = req.user._id;
   const job = await Job.create({
     title,
@@ -61,6 +61,7 @@ export const postJob = catchAsyncErrors(async (req, res, next) => {
     salaryTo,
     postedBy,
   });
+
   res.status(200).json({
     success: true,
     message: "Job Posted Successfully!",
@@ -112,15 +113,31 @@ export const deleteJob = catchAsyncErrors(async (req, res, next) => {
       new ErrorHandler("Job Seeker not allowed to access this resource.", 400)
     );
   }
+
   const { id } = req.params;
   const job = await Job.findById(id);
   if (!job) {
     return next(new ErrorHandler("OOPS! Job not found.", 404));
   }
+
+  // ── Cascade delete ────────────────────────────────────────────
+  // 1. Find all applications for this job
+  const applications = await Application.find({ jobId: id });
+  const applicationIds = applications.map((a) => a._id);
+
+  // 2. Delete all escrow records linked to those applications
+  if (applicationIds.length > 0) {
+    await Escrow.deleteMany({ applicationId: { $in: applicationIds } });
+    // 3. Delete all applications for this job
+    await Application.deleteMany({ jobId: id });
+  }
+
+  // 4. Delete the job itself
   await job.deleteOne();
+
   res.status(200).json({
     success: true,
-    message: "Job Deleted!",
+    message: "Job and all related applications deleted successfully.",
   });
 });
 
