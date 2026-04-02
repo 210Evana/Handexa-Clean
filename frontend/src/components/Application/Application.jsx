@@ -3,21 +3,18 @@ import React, { useContext, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { Context } from "../../main";
-import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaFileAlt, FaArrowLeft, FaFile, FaTimes } from "react-icons/fa";
+import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaFileAlt, FaArrowLeft, FaFile, FaTimes, FaLock } from "react-icons/fa";
 import "./Application.css";
 
 const Application = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [coverLetter, setCoverLetter] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
-  const [resume, setResume] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
-
   const { isAuthorized, user } = useContext(Context);
   const navigateTo = useNavigate();
   const { id } = useParams();
+
+  // Only coverLetter and resume are editable — everything else comes from user profile
+  const [coverLetter, setCoverLetter] = useState("");
+  const [resume,      setResume]      = useState(null);
+  const [submitting,  setSubmitting]  = useState(false);
 
   if (!isAuthorized || (user && user.role === "Employer")) {
     navigateTo("/");
@@ -31,19 +28,20 @@ const Application = () => {
 
   const handleApplication = async (e) => {
     e.preventDefault();
-    if (!name || !email || !coverLetter || !phone || !address) {
-      toast.error("Please fill in all required fields.");
+
+    if (!coverLetter.trim()) {
+      toast.error("Please write your pitch before submitting.");
       return;
     }
 
     setSubmitting(true);
     const formData = new FormData();
-    formData.append("name", name);
-    formData.append("email", email);
-    formData.append("phone", phone);
-    formData.append("address", address);
+    formData.append("name",        user.name);
+    formData.append("email",       user.email);
+    formData.append("phone",       user.phone);
+    formData.append("address",     user.address || "");
     formData.append("coverLetter", coverLetter);
-    formData.append("jobId", id);
+    formData.append("jobId",       id);
     if (resume) formData.append("resume", resume);
 
     try {
@@ -53,8 +51,8 @@ const Application = () => {
         { withCredentials: true, headers: { "Content-Type": "multipart/form-data" } }
       );
       toast.success(data.message);
-      setName(""); setEmail(""); setCoverLetter("");
-      setPhone(""); setAddress(""); setResume(null);
+      setCoverLetter("");
+      setResume(null);
       navigateTo("/job/getall");
     } catch (error) {
       toast.error(error.response?.data?.message || "Application failed. Please try again.");
@@ -65,6 +63,7 @@ const Application = () => {
 
   return (
     <div className="app-root">
+
       {/* HEADER */}
       <div className="app-header">
         <div className="app-header-inner">
@@ -81,33 +80,48 @@ const Application = () => {
       <div className="app-body">
         <form className="app-form" onSubmit={handleApplication}>
 
-          {/* PERSONAL INFO */}
+          {/* PERSONAL INFO — read-only, pulled from profile */}
           <div className="app-section">
-            <div className="app-section-title"><FaUser /> Personal Information</div>
+            <div className="app-section-title">
+              <FaUser /> Personal Information
+              <span className="app-lock-note">
+                <FaLock style={{ fontSize: "10px" }} />
+                Auto-filled from your profile —{" "}
+                <Link to="/profile" className="app-edit-link">edit profile</Link>
+              </span>
+            </div>
 
             <div className="app-row">
               <div className="app-field">
-                <label className="app-label">Full Name *</label>
-                <input className="app-input" type="text" placeholder="e.g. James Mwangi"
-                  value={name} onChange={e => setName(e.target.value)} required />
+                <label className="app-label">Full Name</label>
+                <div className="app-input app-input-locked">
+                  <FaUser className="app-locked-icon" />
+                  {user?.name || "—"}
+                </div>
               </div>
               <div className="app-field">
-                <label className="app-label">Phone Number *</label>
-                <input className="app-input" type="tel" placeholder="+254 712 345 678"
-                  value={phone} onChange={e => setPhone(e.target.value)} required />
+                <label className="app-label">Phone Number</label>
+                <div className="app-input app-input-locked">
+                  <FaPhone className="app-locked-icon" />
+                  {user?.phone || "—"}
+                </div>
               </div>
             </div>
 
             <div className="app-field">
-              <label className="app-label">Email Address *</label>
-              <input className="app-input" type="email" placeholder="your.email@example.com"
-                value={email} onChange={e => setEmail(e.target.value)} required />
+              <label className="app-label">Email Address</label>
+              <div className="app-input app-input-locked">
+                <FaEnvelope className="app-locked-icon" />
+                {user?.email || "—"}
+              </div>
             </div>
 
             <div className="app-field">
-              <label className="app-label">Your Address / Location *</label>
-              <input className="app-input" type="text" placeholder="e.g. Westlands, Nairobi"
-                value={address} onChange={e => setAddress(e.target.value)} required />
+              <label className="app-label">Your Address / Location</label>
+              <div className="app-input app-input-locked">
+                <FaMapMarkerAlt className="app-locked-icon" />
+                {user?.address || <span style={{ opacity: 0.5 }}>Not set — add in your profile</span>}
+              </div>
             </div>
           </div>
 
@@ -116,9 +130,13 @@ const Application = () => {
             <div className="app-section-title"><FaFileAlt /> Your Pitch *</div>
             <div className="app-field">
               <label className="app-label">Why should this employer hire you?</label>
-              <textarea className="app-textarea"
+              <textarea
+                className="app-textarea"
                 placeholder="Tell the employer about your skills, experience, and why you're the right person for this job. Be specific — mention relevant work you've done before."
-                value={coverLetter} onChange={e => setCoverLetter(e.target.value)} required />
+                value={coverLetter}
+                onChange={e => setCoverLetter(e.target.value)}
+                required
+              />
             </div>
           </div>
 
@@ -129,14 +147,18 @@ const Application = () => {
               <span className="app-optional-badge">Optional</span>
             </div>
             <div className="app-field">
-              <label className="app-label">Photo of your work, ID, or certificate (PNG/JPG/WEBP)</label>
+              <label className="app-label">
+                Photo of your work, ID, or certificate (PNG/JPG/WEBP)
+              </label>
               {resume ? (
                 <div className="app-file-selected">
                   <FaFile />
                   <span>{resume.name}</span>
-                  <button type="button"
-                    style={{marginLeft:'auto',background:'none',border:'none',cursor:'pointer',color:'#9b8e83'}}
-                    onClick={() => setResume(null)}>
+                  <button
+                    type="button"
+                    style={{ marginLeft: "auto", background: "none", border: "none", cursor: "pointer", color: "#9b8e83" }}
+                    onClick={() => setResume(null)}
+                  >
                     <FaTimes />
                   </button>
                 </div>
@@ -145,8 +167,12 @@ const Application = () => {
                   <div className="app-file-icon">📎</div>
                   <p className="app-file-label">Click to upload a file</p>
                   <p className="app-file-hint">PNG, JPG, JPEG, WEBP — not required</p>
-                  <input type="file" accept=".png,.jpg,.jpeg,.webp"
-                    onChange={handleFileChange} className="app-file-input" />
+                  <input
+                    type="file"
+                    accept=".png,.jpg,.jpeg,.webp"
+                    onChange={handleFileChange}
+                    className="app-file-input"
+                  />
                 </div>
               )}
             </div>

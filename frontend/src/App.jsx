@@ -72,7 +72,7 @@ const App = () => {
           <Route path="/admin/dashboard"         element={<AdminDashboard />} />
 
           {/* ── 404 ── */}
-          <Route path="/profile/edit"             element={<EditProfile />} />
+          <Route path="/profile"             element={<EditProfile />} />
           <Route path="*"                        element={<NotFound />} />
         </Routes>
         <Footer />
