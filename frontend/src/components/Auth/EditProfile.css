@@ -1,0 +1,362 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&family=Outfit:wght@300;400;500;600&display=swap');
+
+/* ═══════════════════════════════════════
+   EDIT PROFILE — role-adaptive
+═══════════════════════════════════════ */
+.ep-root {
+  min-height: 100vh;
+}
+
+/* ── EMPLOYER: navy ── */
+.ep-root.employer {
+  background: #0a0f1e;
+  font-family: 'DM Sans', sans-serif;
+  color: #e8eaf2;
+  --accent:        #a3e635;
+  --accent-dim:    rgba(163,230,53,0.1);
+  --accent-border: rgba(163,230,53,0.25);
+  --accent-text:   #0a0f1e;
+  --surface:       #111827;
+  --surface-2:     #0d1424;
+  --border:        rgba(255,255,255,0.07);
+  --border-focus:  rgba(163,230,53,0.4);
+  --text-primary:  #fff;
+  --text-muted:    #6b7280;
+  --header-bg:     #0d1424;
+  --header-border: rgba(163,230,53,0.1);
+  --kicker-color:  #a3e635;
+  --heading-font:  'Bebas Neue', sans-serif;
+  --danger:        #f87171;
+}
+
+/* ── SEEKER: cream ── */
+.ep-root.seeker {
+  background: #faf7f2;
+  font-family: 'Outfit', sans-serif;
+  color: #3d3530;
+  --accent:        #e07b4f;
+  --accent-dim:    rgba(224,123,79,0.08);
+  --accent-border: rgba(224,123,79,0.25);
+  --accent-text:   #fff;
+  --surface:       #fff;
+  --surface-2:     #f5f0ea;
+  --border:        #e8e0d4;
+  --border-focus:  #e07b4f;
+  --text-primary:  #1a1410;
+  --text-muted:    #9b8e83;
+  --header-bg:     #1a1410;
+  --header-border: rgba(224,123,79,0.15);
+  --kicker-color:  #e07b4f;
+  --heading-font:  'Playfair Display', serif;
+  --danger:        #e05353;
+}
+
+/* ─── HEADER ─── */
+.ep-header {
+  padding: 44px 40px 36px;
+  border-bottom: 1px solid var(--header-border);
+}
+.ep-root.employer .ep-header { background: var(--header-bg); }
+.ep-root.seeker   .ep-header { background: var(--header-bg); }
+
+.ep-header-inner { max-width: 780px; margin: 0 auto; }
+
+.ep-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.82rem;
+  color: var(--accent);
+  text-decoration: none;
+  margin-bottom: 20px;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+.ep-back:hover { opacity: 1; }
+
+.ep-kicker {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--kicker-color);
+  margin-bottom: 10px;
+}
+.ep-h1 {
+  font-family: var(--heading-font);
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  color: #fff;
+  margin: 0 0 8px;
+  line-height: 1.1;
+}
+.ep-root.employer .ep-h1 { letter-spacing: 0.03em; }
+.ep-sub {
+  font-size: 0.875rem;
+  color: rgba(255,255,255,0.38);
+  margin: 0;
+}
+
+/* ─── BODY ─── */
+.ep-body {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 36px 40px 60px;
+}
+
+/* ─── AVATAR ROW ─── */
+.ep-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  margin-bottom: 24px;
+}
+.ep-avatar-circle {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--heading-font);
+  font-size: 1.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.ep-avatar-img {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.ep-avatar-info { flex: 1; }
+.ep-avatar-name {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+.ep-avatar-role {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.ep-avatar-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1.5px solid var(--accent-border);
+  background: var(--accent-dim);
+  color: var(--accent);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.ep-avatar-upload-btn:hover {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+/* ─── SECTION ─── */
+.ep-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.ep-root.employer .ep-section { box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+.ep-root.seeker   .ep-section { box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+
+.ep-section-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ep-section-icon { color: var(--accent); }
+
+/* ─── FIELDS ─── */
+.ep-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.ep-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.ep-field:last-child { margin-bottom: 0; }
+
+.ep-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.ep-input, .ep-textarea, .ep-select {
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--surface-2);
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+.ep-input:focus,
+.ep-textarea:focus,
+.ep-select:focus { border-color: var(--border-focus); }
+.ep-input::placeholder,
+.ep-textarea::placeholder { color: var(--text-muted); opacity: 0.6; }
+.ep-root.employer .ep-select option { background: #111827; }
+
+.ep-textarea {
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+/* ─── RESUME UPLOAD ─── */
+.ep-file-area {
+  border: 1.5px dashed var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  position: relative;
+}
+.ep-file-area:hover { border-color: var(--accent); }
+.ep-file-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+.ep-file-icon { font-size: 1.5rem; margin-bottom: 6px; opacity: 0.4; }
+.ep-file-label { font-size: 0.85rem; font-weight: 500; color: var(--text-primary); }
+.ep-file-hint  { font-size: 0.75rem; color: var(--text-muted); margin-top: 3px; }
+
+.ep-file-selected {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-border);
+  font-size: 0.875rem;
+  color: var(--accent);
+}
+.ep-file-remove {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 13px;
+  transition: color 0.2s;
+}
+.ep-file-remove:hover { color: var(--danger); }
+
+.ep-current-resume {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.ep-current-thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+.ep-current-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ─── PASSWORD SECTION ─── */
+.ep-password-toggle {
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-family: inherit;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 16px;
+}
+.ep-password-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ─── SUBMIT ─── */
+.ep-submit-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.ep-submit {
+  padding: 13px 32px;
+  border: none;
+  border-radius: 10px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.02em;
+}
+.ep-submit:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
+.ep-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.ep-cancel {
+  padding: 13px 24px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+.ep-cancel:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 640px) {
+  .ep-header { padding: 28px 20px 24px; }
+  .ep-body   { padding: 24px 20px 48px; }
+  .ep-row    { grid-template-columns: 1fr; }
+  .ep-avatar-row { flex-wrap: wrap; }
+}
