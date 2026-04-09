@@ -372,7 +372,7 @@ const EditProfile = () => {
             )}
           </div>
 
-          {/* -- SUBMIT -- */
+          {/* -- SUBMIT -- */}
           <div className="ep-submit-row">
             <button type="submit" className="ep-submit" disabled={submitting}>
               {submitting ? "Saving..." : "Save Changes"}
