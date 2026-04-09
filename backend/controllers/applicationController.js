@@ -5,11 +5,40 @@ import { Job } from "../models/jobSchema.js";
 import cloudinary from "cloudinary";
 import mongoose from "mongoose";
 
+/* ─── Helper: is user active premium? ─── */
+const isActivePremium = (user) => {
+  if (user.role === "Admin") return true;
+  if (!user.isPremium) return false;
+  if (!user.premiumExpiresAt) return true;
+  return new Date(user.premiumExpiresAt) > new Date();
+};
+
 // Job Seeker applies for a job
 export const postApplication = catchAsyncErrors(async (req, res, next) => {
   const { role } = req.user;
   if (role === "Employer") {
     return next(new ErrorHandler("Employers not allowed to apply for jobs.", 400));
+  }
+
+  // ── FREE SEEKER: limit 3 applications per day ──────────────────
+  if (!isActivePremium(req.user)) {
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const todayCount = await Application.countDocuments({
+      "applicantID.user": req.user._id,
+      createdAt: { $gte: startOfDay },
+    });
+
+    if (todayCount >= 3) {
+      return res.status(403).json({
+        success: false,
+        limitReached: true,
+        message: "Free accounts can only apply to 3 jobs per day. Upgrade to Premium for unlimited applications.",
+        todayCount,
+        limit: 3,
+      });
+    }
   }
 
   const { name, email, coverLetter, phone, address, jobId } = req.body;
@@ -22,6 +51,15 @@ export const postApplication = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Job not found!", 404));
   }
 
+  // Check if already applied
+  const alreadyApplied = await Application.findOne({
+    "applicantID.user": req.user._id,
+    jobId,
+  });
+  if (alreadyApplied) {
+    return next(new ErrorHandler("You have already applied for this job.", 400));
+  }
+
   let resumeData = null;
   if (req.files?.resume) {
     const resume = req.files.resume;
@@ -29,7 +67,7 @@ export const postApplication = catchAsyncErrors(async (req, res, next) => {
     if (!allowedFormats.includes(resume.mimetype)) {
       return next(new ErrorHandler("Invalid file type. Only PNG, JPEG, or WEBP allowed.", 400));
     }
-    const cloudinaryResponse = await cloudinary.uploader.upload(resume.tempFilePath);
+    const cloudinaryResponse = await cloudinary.v2.uploader.upload(resume.tempFilePath);
     if (!cloudinaryResponse || cloudinaryResponse.error) {
       return next(new ErrorHandler("Failed to upload Resume to Cloudinary", 500));
     }
@@ -46,21 +84,26 @@ export const postApplication = catchAsyncErrors(async (req, res, next) => {
     address,
     coverLetter,
     resume: resumeData,
-    applicantID: {
-      user: req.user._id,
-      role: "Job Seeker",
-    },
-    employerID: {
-      user: jobDetails.postedBy,
-      role: "Employer",
-    },
+    applicantID: { user: req.user._id, role: "Job Seeker" },
+    employerID:  { user: jobDetails.postedBy, role: "Employer" },
     jobId,
   });
+
+  // Return remaining applications for today
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+  const todayCount = await Application.countDocuments({
+    "applicantID.user": req.user._id,
+    createdAt: { $gte: startOfDay },
+  });
+
+  const remaining = isActivePremium(req.user) ? null : Math.max(0, 3 - todayCount);
 
   res.status(200).json({
     success: true,
     message: "Application Submitted!",
     application,
+    remaining, // null = premium (unlimited), number = free remaining today
   });
 });
 
@@ -75,7 +118,10 @@ export const jobseekerGetAllApplications = catchAsyncErrors(async (req, res, nex
     .populate({ path: "applicantID.user", select: "name email phone" })
     .populate({ path: "employerID.user", select: "name email" });
 
-  res.status(200).json({ success: true, applications });
+  // Filter out applications where job was deleted
+  const valid = applications.filter((a) => a.jobId !== null && a.jobId !== undefined);
+
+  res.status(200).json({ success: true, applications: valid });
 });
 
 // Employer views all applications
@@ -88,10 +134,9 @@ export const employerGetAllApplications = catchAsyncErrors(async (req, res, next
     .populate({ path: "jobId", select: "title category county location" })
     .populate("applicantID.user", "name email");
 
-  res.status(200).json({
-    success: true,
-    applications,
-  });
+  const valid = applications.filter((a) => a.jobId !== null && a.jobId !== undefined);
+
+  res.status(200).json({ success: true, applications: valid });
 });
 
 // Job Seeker deletes an application
@@ -110,10 +155,7 @@ export const jobseekerDeleteApplication = catchAsyncErrors(async (req, res, next
   }
 
   await application.deleteOne();
-  res.status(200).json({
-    success: true,
-    message: "Application Deleted!",
-  });
+  res.status(200).json({ success: true, message: "Application Deleted!" });
 });
 
 // Employer updates application status
@@ -125,19 +167,13 @@ export const updateApplicationStatus = catchAsyncErrors(async (req, res, next) =
   const { applicationId } = req.params;
   const { status } = req.body;
 
-  if (!applicationId) {
-    return next(new ErrorHandler("Application ID is required", 400));
+  if (!applicationId || !mongoose.Types.ObjectId.isValid(applicationId)) {
+    return next(new ErrorHandler("Invalid application ID", 400));
   }
-
-  if (!mongoose.Types.ObjectId.isValid(applicationId)) {
-    return next(new ErrorHandler("Invalid application ID format", 400));
-  }
-
   if (!status) {
     return next(new ErrorHandler("Status is required", 400));
   }
 
-  // ── Capitalise first letter to match schema enum: "Pending" | "Accepted" | "Rejected"
   const normalise = (s) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
   const normalisedStatus = normalise(status);
 
@@ -152,14 +188,6 @@ export const updateApplicationStatus = catchAsyncErrors(async (req, res, next) =
 
   if (application.employerID.user.toString() !== req.user._id.toString()) {
     return next(new ErrorHandler("Not authorized to update this application", 403));
-  }
-
-  if (application.status === normalisedStatus) {
-    return res.status(200).json({
-      success: true,
-      message: `Application already has status '${normalisedStatus}'`,
-      application,
-    });
   }
 
   application.status = normalisedStatus;
@@ -193,4 +221,25 @@ export const getApplicationById = catchAsyncErrors(async (req, res, next) => {
   }
 
   res.status(200).json({ success: true, application });
+});
+
+// Get today's application count for the logged-in seeker
+export const getTodayApplicationCount = catchAsyncErrors(async (req, res, next) => {
+  if (req.user.role !== "Job Seeker") {
+    return res.status(200).json({ success: true, todayCount: 0, limit: null, remaining: null });
+  }
+
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+
+  const todayCount = await Application.countDocuments({
+    "applicantID.user": req.user._id,
+    createdAt: { $gte: startOfDay },
+  });
+
+  const premium   = isActivePremium(req.user);
+  const limit     = premium ? null : 3;
+  const remaining = premium ? null : Math.max(0, 3 - todayCount);
+
+  res.status(200).json({ success: true, todayCount, limit, remaining, isPremium: premium });
 });

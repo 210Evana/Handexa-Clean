@@ -5,7 +5,8 @@ import { Context } from "../../main";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 import MessageBubble from "./MessageBubble";
-import { FaArrowLeft, FaPaperPlane, FaComments } from "react-icons/fa";
+import { FaArrowLeft, FaPaperPlane, FaComments, FaCrown } from "react-icons/fa";
+import { PremiumModal } from "../PremiumGate/PremiumGate";
 import "./Messages.css";
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -63,6 +64,8 @@ const MessagePage = () => {
   const [loadingApp,      setLoadingApp]       = useState(true);
   const [appError,        setAppError]         = useState(false);
   const [sending,         setSending]          = useState(false);
+  const [remaining,       setRemaining]        = useState(null); // null=premium, number=free msgs left
+  const [showUpgrade,     setShowUpgrade]      = useState(false);
 
   // ── Presence & typing state ──
   const [otherOnline,     setOtherOnline]      = useState(false);
@@ -74,6 +77,9 @@ const MessagePage = () => {
   const typingTimer    = useRef(null);
 
   const isEmployer = user?.role === "Employer";
+  const isPremium  =
+    user?.role === "Admin" ||
+    (user?.isPremium && (!user?.premiumExpiresAt || new Date(user.premiumExpiresAt) > new Date()));
   const roleClass  = isEmployer ? "employer" : "seeker";
 
   /* ── Keep module-level _userId in sync so socket.auth sends it ── */
@@ -99,7 +105,9 @@ const MessagePage = () => {
       )
       .then(({ data }) => {
         setMessages(data.messages || []);
-        // Mark everything as read as soon as we open the chat
+        if (data.remaining !== null && data.remaining !== undefined) {
+          setRemaining(data.remaining);
+        }
         callMarkRead();
       })
       .catch(() => toast.error("Failed to load messages"))
@@ -280,19 +288,25 @@ const MessagePage = () => {
     setNewMessage(""); // optimistic clear
 
     try {
-      await axios.post(
+      const { data } = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/v1/message/send`,
         { applicationId, message: text },
         { withCredentials: true }
       );
+      if (data.remaining !== null && data.remaining !== undefined) {
+        setRemaining(data.remaining);
+      }
       // The "receiveMessage" socket event fired by the server adds it to state.
-      // No manual setMessages needed here.
     } catch (err) {
-      const status = err.response?.status;
-      if (status === 401)      toast.error("Please log in to send messages");
-      else if (status === 403) toast.error("Not authorised");
-      else if (status === 404) toast.error("Application not found");
-      else                     toast.error("Failed to send message");
+      const status    = err.response?.status;
+      const limitHit  = err.response?.data?.limitReached;
+      if (limitHit) {
+        setRemaining(0);
+        setShowUpgrade(true);
+      } else if (status === 401) toast.error("Please log in to send messages");
+      else if (status === 403)   toast.error("Not authorised");
+      else if (status === 404)   toast.error("Application not found");
+      else                       toast.error("Failed to send message");
       setNewMessage(text); // restore on failure
     } finally {
       setSending(false);
@@ -376,6 +390,38 @@ const MessagePage = () => {
         </div>
       </div>
 
+      {/* ══ UPGRADE MODAL ══ */}
+      {showUpgrade && <PremiumModal onClose={() => setShowUpgrade(false)} />}
+
+      {/* ══ FREE MESSAGE LIMIT BAR ══ */}
+      {!isPremium && remaining !== null && (
+        <div style={{
+          padding: "10px 20px",
+          background: remaining === 0 ? "rgba(224,123,79,0.1)" : "rgba(59,130,246,0.06)",
+          borderBottom: remaining === 0 ? "1px solid rgba(224,123,79,0.25)" : "1px solid rgba(59,130,246,0.15)",
+          display: "flex", alignItems: "center", gap: "10px",
+          fontSize: "0.8rem",
+          color: remaining === 0 ? "var(--accent)" : "var(--text-muted)",
+          flexWrap: "wrap",
+        }}>
+          <FaCrown style={{ flexShrink: 0, opacity: 0.7 }} />
+          {remaining === 0
+            ? "You have used all 3 free messages in this conversation."
+            : `${remaining} of 3 free messages remaining in this conversation.`}
+          <button
+            onClick={() => setShowUpgrade(true)}
+            style={{
+              background: "none", border: "none", cursor: "pointer",
+              fontWeight: 700, color: "var(--accent)",
+              fontSize: "inherit", textDecoration: "underline", padding: 0,
+            }}
+          >
+            Upgrade to Premium
+          </button>
+          for unlimited messaging.
+        </div>
+      )}
+
       {/* ══ ERROR BANNER ══ */}
       {appError && (
         <div className="msg-error-banner">
@@ -444,12 +490,12 @@ const MessagePage = () => {
             value={newMessage}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            disabled={appError}
+            disabled={appError || (!isPremium && remaining === 0)}
           />
           <button
             className="msg-send-btn"
             onClick={handleSend}
-            disabled={!newMessage.trim() || sending || appError}
+            disabled={!newMessage.trim() || sending || appError || (!isPremium && remaining === 0)}
             title="Send (Enter)"
           >
             <FaPaperPlane />
