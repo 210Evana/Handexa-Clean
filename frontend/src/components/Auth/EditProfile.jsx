@@ -21,7 +21,7 @@ const NICHES = [
   "Other Informal Jobs",
 ];
 
-/* ─── Initials avatar ─── */
+/* --- Initials avatar --- */
 const initials = (name) =>
   name ? name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase() : "?";
 
@@ -35,7 +35,7 @@ const EditProfile = () => {
   const isEmployer = user.role === "Employer";
   const roleClass  = isEmployer ? "employer" : "seeker";
 
-  /* ── Form state pre-filled from user ── */
+  /* -- Form state pre-filled from user -- */
   const [name,        setName]        = useState(user.name        || "");
   const [email,       setEmail]       = useState(user.email       || "");
   const [phone,       setPhone]       = useState(user.phone       || "");
@@ -46,7 +46,7 @@ const EditProfile = () => {
   const [thirdNiche,  setThirdNiche]  = useState(user.niches?.thirdNiche  || "");
   const [resume,      setResume]      = useState(null);
 
-  /* ── Password change (optional) ── */
+  /* -- Password change (optional) -- */
   const [showPassword,    setShowPassword]    = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword,     setNewPassword]     = useState("");
@@ -113,7 +113,7 @@ const EditProfile = () => {
   return (
     <div className={`ep-root ${roleClass}`}>
 
-      {/* ── HEADER ── */}
+      {/* -- HEADER -- */}
       <div className="ep-header">
         <div className="ep-header-inner">
           <Link to="/" className="ep-back">
@@ -121,15 +121,15 @@ const EditProfile = () => {
           </Link>
           <p className="ep-kicker">Account Settings</p>
           <h1 className="ep-h1">Edit Profile</h1>
-          <p className="ep-sub">Update your information — changes apply to all future applications</p>
+          <p className="ep-sub">Update your information -- changes apply to all future applications</p>
         </div>
       </div>
 
-      {/* ── BODY ── */}
+      {/* -- BODY -- */}
       <div className="ep-body">
         <form onSubmit={handleSubmit}>
 
-          {/* ── AVATAR ROW ── */}
+          {/* -- AVATAR ROW -- */}
           <div className="ep-avatar-row">
             {user.resume?.url ? (
               <img src={user.resume.url} alt="profile" className="ep-avatar-img" />
@@ -142,7 +142,7 @@ const EditProfile = () => {
             </div>
           </div>
 
-          {/* ── PERSONAL INFO ── */}
+          {/* -- PERSONAL INFO -- */}
           <div className="ep-section">
             <div className="ep-section-title">
               <FaUser className="ep-section-icon" /> Personal Information
@@ -198,7 +198,7 @@ const EditProfile = () => {
             </div>
           </div>
 
-          {/* ── COVER LETTER (seekers only) ── */}
+          {/* -- COVER LETTER (seekers only) -- */}
           {isSeeker && (
             <div className="ep-section">
               <div className="ep-section-title">
@@ -218,7 +218,7 @@ const EditProfile = () => {
             </div>
           )}
 
-          {/* ── NICHES (seekers only) ── */}
+          {/* -- NICHES (seekers only) -- */}
           {isSeeker && (
             <div className="ep-section">
               <div className="ep-section-title">
@@ -271,7 +271,7 @@ const EditProfile = () => {
             </div>
           )}
 
-          {/* ── PROFILE DOCUMENT / RESUME ── */}
+          {/* -- PROFILE DOCUMENT / RESUME -- */}
           <div className="ep-section">
             <div className="ep-section-title">
               <FaFile className="ep-section-icon" />
@@ -288,7 +288,7 @@ const EditProfile = () => {
                   onClick={() => window.open(user.resume.url, "_blank")}
                 />
                 <span className="ep-current-label">
-                  Current document — upload a new one to replace it
+                  Current document -- upload a new one to replace it
                 </span>
               </div>
             )}
@@ -321,7 +321,7 @@ const EditProfile = () => {
           </div>
 
 
-          {/* ── CHANGE PASSWORD ── */}
+          {/* -- CHANGE PASSWORD -- */}
           <div className="ep-section">
             <div className="ep-section-title">
               <FaLock className="ep-section-icon" /> Change Password
@@ -331,7 +331,7 @@ const EditProfile = () => {
               className="ep-password-toggle"
               onClick={() => setShowPassword(p => !p)}
             >
-              {showPassword ? "✕ Cancel password change" : "🔒 Change my password"}
+              {showPassword ? "Cancel password change" : "Change my password"}
             </button>
 
             {showPassword && (
@@ -372,10 +372,10 @@ const EditProfile = () => {
             )}
           </div>
 
-          {/* ── SUBMIT ── */
+          {/* -- SUBMIT -- */
           <div className="ep-submit-row">
             <button type="submit" className="ep-submit" disabled={submitting}>
-              {submitting ? "Saving..." : "Save Changes →"}
+              {submitting ? "Saving..." : "Save Changes"}
             </button>
             <Link to="/" className="ep-cancel">Cancel</Link>
           </div>
