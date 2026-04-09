@@ -320,7 +320,59 @@ const EditProfile = () => {
             )}
           </div>
 
-          {/* ── SUBMIT ── */}
+
+          {/* ── CHANGE PASSWORD ── */}
+          <div className="ep-section">
+            <div className="ep-section-title">
+              <FaLock className="ep-section-icon" /> Change Password
+            </div>
+            <button
+              type="button"
+              className="ep-password-toggle"
+              onClick={() => setShowPassword(p => !p)}
+            >
+              {showPassword ? "✕ Cancel password change" : "🔒 Change my password"}
+            </button>
+
+            {showPassword && (
+              <>
+                <div className="ep-field">
+                  <label className="ep-label">Current Password</label>
+                  <input
+                    className="ep-input"
+                    type="password"
+                    value={currentPassword}
+                    onChange={e => setCurrentPassword(e.target.value)}
+                    placeholder="Enter your current password"
+                  />
+                </div>
+                <div className="ep-row">
+                  <div className="ep-field">
+                    <label className="ep-label">New Password</label>
+                    <input
+                      className="ep-input"
+                      type="password"
+                      value={newPassword}
+                      onChange={e => setNewPassword(e.target.value)}
+                      placeholder="At least 8 characters"
+                    />
+                  </div>
+                  <div className="ep-field">
+                    <label className="ep-label">Confirm New Password</label>
+                    <input
+                      className="ep-input"
+                      type="password"
+                      value={confirmPassword}
+                      onChange={e => setConfirmPassword(e.target.value)}
+                      placeholder="Repeat new password"
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* ── SUBMIT ── */
           <div className="ep-submit-row">
             <button type="submit" className="ep-submit" disabled={submitting}>
               {submitting ? "Saving..." : "Save Changes →"}

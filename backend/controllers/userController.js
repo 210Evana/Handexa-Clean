@@ -108,6 +108,17 @@ export const updateUser = catchAsyncErrors(async (req, res, next) => {
     if (thirdNiche  !== undefined) user.niches.thirdNiche  = thirdNiche;
   }
 
+  // ── Password change (optional) ────────────────────────────────
+  if (req.body.currentPassword && req.body.newPassword) {
+    // Re-fetch with password field (it has select:false)
+    const userWithPwd = await User.findById(req.user._id).select("+password");
+    const isMatch = await userWithPwd.comparePassword(req.body.currentPassword);
+    if (!isMatch) {
+      return next(new ErrorHandler("Current password is incorrect", 400));
+    }
+    user.password = req.body.newPassword;
+  }
+
   // ── Resume / profile image upload ──
   if (req.files?.resume) {
     const resumeFile = req.files.resume;
