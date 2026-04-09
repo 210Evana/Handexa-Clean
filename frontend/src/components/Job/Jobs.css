@@ -1,0 +1,257 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&family=Outfit:wght@400;500;600&family=Playfair+Display:wght@700&display=swap');
+
+/* ═══════════════════════════════════════
+   JOBS — role-adaptive
+═══════════════════════════════════════ */
+
+/* ── EMPLOYER tokens ── */
+.jl-root.employer {
+  background: #0a0f1e;
+  font-family: 'DM Sans', sans-serif;
+  --accent:          #a3e635;
+  --accent-text:     #0a0f1e;
+  --card-bg:         #111827;
+  --border:          rgba(255,255,255,.07);
+  --hover-border:    rgba(163,230,53,.3);
+  --hover-bg:        rgba(163,230,53,.03);
+  --hover-shadow:    rgba(163,230,53,.08);
+  --badge-bg:        rgba(163,230,53,.1);
+  --badge-text:      #a3e635;
+  --badge-border:    rgba(163,230,53,.2);
+  --pill-bg:         rgba(255,255,255,.04);
+  --pill-border:     rgba(255,255,255,.08);
+  --pill-text:       #6b7280;
+  --pill-active-bg:  #a3e635;
+  --pill-active-txt: #0a0f1e;
+  --heading:         #c9cdd8;   /* softened — was #fff */
+  --text:            #8a93a8;   /* softened body text */
+  --muted:           #4b5563;
+  --salary:          #a3e635;
+  --hero-bg:         linear-gradient(135deg, #0d1424 0%, #0a0f1e 100%);
+  --hero-border:     rgba(163,230,53,.1);
+  --hero-sub:        rgba(232,234,242,.35);
+  --link-bg:         rgba(163,230,53,.1);
+  --link-color:      #a3e635;
+  --heading-font:    'Bebas Neue', sans-serif;
+  --count-accent:    #a3e635;
+  --empty-color:     #4b5563;
+}
+
+/* ── SEEKER tokens ── */
+.jl-root.seeker {
+  background: #faf7f2;
+  font-family: 'Outfit', sans-serif;
+  --accent:          #e07b4f;
+  --accent-text:     #fff;
+  --card-bg:         #fff;
+  --border:          #e8e0d4;
+  --hover-border:    #e07b4f;
+  --hover-bg:        rgba(224,123,79,.03);
+  --hover-shadow:    rgba(224,123,79,.1);
+  --badge-bg:        #fdf0e8;
+  --badge-text:      #c9602a;
+  --badge-border:    #f5d5c0;
+  --pill-bg:         #f5f0ea;
+  --pill-border:     #e8e0d4;
+  --pill-text:       #7a6e63;
+  --pill-active-bg:  #e07b4f;
+  --pill-active-txt: #fff;
+  --heading:         #1a1410;
+  --text:            #3d3530;
+  --muted:           #9b8e83;
+  --salary:          #1a1410;
+  --hero-bg:         #1a1410;
+  --hero-border:     rgba(224,123,79,.15);
+  --hero-sub:        rgba(255,255,255,.38);
+  --link-bg:         #e07b4f;
+  --link-color:      #fff;
+  --heading-font:    'Playfair Display', serif;
+  --count-accent:    #e07b4f;
+  --empty-color:     #9b8e83;
+}
+
+/* ─── ROOT ─── */
+.jl-root { min-height: 100vh; }
+
+/* ─── HERO ─── */
+.jl-hero {
+  background: var(--hero-bg);
+  padding: 60px 40px 50px;
+  border-bottom: 1px solid var(--hero-border);
+}
+.jl-hero-inner { max-width: 1200px; margin: 0 auto; }
+
+.jl-kicker {
+  font-size: 11px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.jl-h1 {
+  font-family: var(--heading-font);
+  font-size: clamp(2.2rem, 4vw, 3.5rem);
+  color: #fff;
+  margin: 0 0 10px;
+  line-height: 1.1;
+}
+.jl-root.employer .jl-h1 { letter-spacing: .03em; }
+.jl-sub {
+  font-size: .95rem;
+  color: var(--hero-sub);
+  margin: 0;
+}
+
+/* ─── BODY ─── */
+.jl-body { max-width: 1200px; margin: 0 auto; padding: 40px; }
+
+/* ─── FILTER PILLS ─── */
+.jl-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
+
+.jl-pill {
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: .82rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  border: 1px solid var(--pill-border);
+  background: var(--pill-bg);
+  color: var(--pill-text);
+  transition: all .2s;
+}
+.jl-pill:hover { border-color: var(--accent); color: var(--accent); }
+.jl-pill.active {
+  background: var(--pill-active-bg);
+  color: var(--pill-active-txt);
+  border-color: var(--pill-active-bg);
+}
+
+/* ─── COUNT ─── */
+.jl-count { font-size: .85rem; color: var(--muted); margin-bottom: 24px; }
+.jl-count strong { color: var(--count-accent); }
+
+/* ─── GRID ─── */
+.jl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+/* ─── CARD ─── */
+.jl-card {
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  transition: border-color .25s, transform .2s, box-shadow .25s, background .2s;
+}
+.jl-card:hover {
+  border-color: var(--hover-border);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px var(--hover-shadow);
+  background: var(--hover-bg);
+}
+
+.jl-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+
+.jl-badge {
+  background: var(--badge-bg);
+  color: var(--badge-text);
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  border: 1px solid var(--badge-border);
+}
+
+.jl-card-title {
+  font-family: var(--heading-font);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--heading);
+  margin: 0 0 6px;
+  line-height: 1.3;
+}
+.jl-root.employer .jl-card-title { font-size: 1.2rem; letter-spacing: .02em; }
+
+.jl-card-loc {
+  font-size: .82rem;
+  color: var(--muted);
+  margin: 0 0 auto;
+}
+
+.jl-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.jl-salary {
+  font-weight: 700;
+  color: var(--salary);
+  font-size: .95rem;
+}
+
+.jl-apply {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--link-bg);
+  color: var(--link-color);
+  font-size: 14px;
+  text-decoration: none;
+  transition: transform .2s;
+}
+.jl-apply:hover { transform: scale(1.1); }
+
+/* ─── EMPTY ─── */
+.jl-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 80px 40px;
+  color: var(--empty-color);
+}
+
+/* ─── SKELETON ─── */
+.jl-skeleton {
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+  height: 180px;
+  position: relative;
+  overflow: hidden;
+}
+.jl-skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.04) 50%, transparent 100%);
+  animation: jlShimmer 1.5s infinite;
+}
+@keyframes jlShimmer {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 768px) {
+  .jl-hero { padding: 40px 20px 36px; }
+  .jl-body { padding: 24px 20px; }
+  .jl-grid { grid-template-columns: 1fr; }
+}
